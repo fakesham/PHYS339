@@ -1,0 +1,18 @@
+//the derivative is just how much the function is increasing or decresing at a certain point 
+def derivative (x) :
+	h = 1./1000.
+	rise = f(x+h) - f(x)
+	run = h 
+	slope = rise /run 
+	return slope
+
+//definite integral is the area under the curve and is approximated by adding rectangles 
+
+def integral (starx, endx, recNum) :
+    width = (float(endx) - float (startx)) /recNum
+    runningSum = 0 
+    for i in range (recNum):
+          height = f (startx + i*width)
+          area = height *width 
+          runningSum += area
+    return runningSum
