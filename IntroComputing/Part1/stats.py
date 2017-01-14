@@ -27,6 +27,11 @@ def variance(trials, mean):
     
 gameMeanData = [mean(gameData[i]) for i in range(10)]
 gameVarianceData = [variance(gameData[i],gameMeanData[i]) for i in range(10)]
+rowStdErr = [(float)(numpy.sqrt(variance(gameData[i],gameMeanData[i]))/numpy.sqrt(10)) for i in range(10)]
+
+# saving all data 
+rowData = numpy.append((gameMeanData,rowStdErr,gameVarianceData), 0)
+numpy.savetxt('rowData.txt',rowData)
 
 # Transpose data to put the columns into rows (for ease of use)
 gameDataTransposed = numpy.transpose(gameData)
@@ -36,6 +41,10 @@ columnMeanData = [mean(gameDataTransposed[i]) for i in range(25)]
 columnVarData = [variance(gameDataTransposed[i],columnMeanData[i]) for i in range(25)] 
 # Standard error: take variance and mean for each column (calculated above)
 columnStdErr = [(float)(numpy.sqrt(variance(gameDataTransposed[i],columnMeanData[i]))/numpy.sqrt(25)) for i in range(25)]
+
+# saving all data 
+colData = numpy.append((columnMeanData,columnStdErr,columnVarData), 0)
+numpy.savetxt('colData.txt',colData)
 
 # x values for plot 
 guessNumber = []
@@ -53,8 +62,9 @@ for i in range(25):
 
 # generating the plot 
 plt.plot(guessNumber,guessMeanFreq,'o')
-plt.figure(figsize=(8,8), dpi=100)
+plt.figure(figsize=(8,8), dpi=500)
 plt.errorbar(guessNumber, guessMeanFreq,yerr=guessStdErr,fmt='o')
+plt.suptitle("Mean frequency of number of guesses",fontsize=20)
 plt.xlabel("Number of guesses",fontsize=16)
-plt.ylabel("Frequency",fontsize=16)
+plt.ylabel("Mean frequency",fontsize=16)
 plt.xlim(15,26)
