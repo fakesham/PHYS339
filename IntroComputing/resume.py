@@ -101,8 +101,7 @@ foo = derivative(t,a)
 p.figure(figsize=(8,8), dpi=100)
 # x-vals: midtime; y-vals: derivative; error vals: uncertainty
 p.errorbar(foo[:,1],foo[:,0],foo[:,2],fmt='none')
-p.suptitle("title",fontsize=20)
-p.xlabel("x",fontsize=16)
+p.xlabel("Number of guesses",fontsize=16)
 p.ylabel("Mean frequency",fontsize=16)
 
 
@@ -152,8 +151,7 @@ bar = integral(t,a)
 p.figure(figsize=(8,8), dpi=100)
 # x-vals: t; y-vals: integral; error vals: uncertainty
 p.errorbar(t,bar[:,0],bar[:,1],fmt='none')
-p.suptitle("title",fontsize=20)
-p.xlabel("x",fontsize=16)
+p.xlabel("Number of guesses",fontsize=16)
 p.ylabel("Mean frequency",fontsize=16)
 
     
