@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # Import data
 gameData = numpy.loadtxt('histogramdata.txt')
-
+print gameData
 
 def mean(trials): 
     tot = 0
@@ -18,15 +18,17 @@ def mean(trials):
         tot += ((i)*trials[i])
     return (float)(tot/(len(trials)))
     
+# input: one row (one trial of 20)
 def variance(trials, mean): 
     varSum = 0
-    for i in range(len(trials)): 
-        varSum += (trials[i]-mean)**2
+    for j in range(len(trials)): 
+        varSum += trials[j]*(trials[j]-mean)**2
     return (float)(varSum/(len(trials)-1))
         
     
 gameMeanData = [mean(gameData[i]) for i in range(10)]
-gameVarianceData = [variance(gameData[i],gameMeanData[i]) for i in range(10)]
+gameVarianceData = [variance(gameData[i],gameMeanData[i]) for i in range(10)] 
+
 rowStdErr = [(float)(numpy.sqrt(variance(gameData[i],gameMeanData[i]))/numpy.sqrt(10)) for i in range(10)]
 
 # saving all data 
@@ -36,11 +38,11 @@ numpy.savetxt('rowData.txt',rowData)
 # Transpose data to put the columns into rows (for ease of use)
 gameDataTransposed = numpy.transpose(gameData)
 # Mean values of each column in the original dataset
-columnMeanData = [mean(gameDataTransposed[i]) for i in range(25)]
+columnMeanData = [mean(gameDataTransposed[i]) for i in range(len(gameDataTransposed))]
 # Variances of each column in the original dataset 
-columnVarData = [variance(gameDataTransposed[i],columnMeanData[i]) for i in range(25)] 
+columnVarData = [variance(gameDataTransposed[i],columnMeanData[i]) for i in range(len(gameDataTransposed))] 
 # Standard error: take variance and mean for each column (calculated above)
-columnStdErr = [(float)(numpy.sqrt(variance(gameDataTransposed[i],columnMeanData[i]))/numpy.sqrt(25)) for i in range(25)]
+columnStdErr = [(float)(numpy.sqrt(variance(gameDataTransposed[i],columnMeanData[i]))/numpy.sqrt(len(gameDataTransposed))) for i in range(len(gameDataTransposed))]
 
 # saving all data 
 colData = numpy.append((columnMeanData,columnStdErr,columnVarData), 0)
@@ -54,7 +56,7 @@ guessMeanFreq = []
 guessStdErr = []
 
 # only take the non-zero columns to add into the plot
-for i in range(25):
+for i in range(len(columnMeanData)):
     if(columnMeanData[i]!=0):
         guessNumber.append(i+1)
         guessMeanFreq.append(columnMeanData[i])
