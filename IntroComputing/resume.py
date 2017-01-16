@@ -9,10 +9,10 @@ import numpy
 import matplotlib.pyplot as p
 #Set custom properties of matplotlib
 #matplotlib will interpret all text as LaTeX
-p.rcParams['text.usetex'] = True
+"""p.rcParams['text.usetex':
 p.rcParams['text.latex.unicode']= False
 p.rcParams['mathtext.fontset'] = 'stix'
-p.rcParams['font.family'] = 'STIXGeneral'
+p.rcParams['font.family'] = 'STIXGeneral'"""
 p.rcParams['figure.autolayout'] = True
 #plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 #from itertools import izip 
@@ -39,21 +39,20 @@ if False:
 
 # once you have written all the required functions, the following
 # should work, and give correct results
-"""
+
 def rms(t,x):
     square = multiply(x,x)
-    mean = integral(t,square)[1] # not true yet!!!
-    mean[1:,:] = numpy.column_stack((t,t))[1:,:]
-    mean[0,:] = 0  # this is probably a matter of dogma
-    return sqrt(mean)
-"""
-def rms(t,x):
-    square = multiply(x,x)
-    mean = integral(t,square) # not true yet!!!
-    mean[1:,:] = numpy.column_stack((t,t))[1:,:]
-    mean[0,:] = 0  # this is probably a matter of dogma
+    # 2 columns; value -> errorbars 
+    mean = integral(t,square)
+    times = numpy.column_stack((t,t))
+    # 2 columns: both time 
+    mean[1:,0] /= times[1:,0]
+    mean[1:,1] /= times[1:,1]
+    # divide both by the times 
+    mean[0,:] = 0
     return sqrt(mean)
     
+
 if False:
     d_rms = rms(t,d)
     p.figure()
@@ -100,7 +99,7 @@ def derivative (t,y):
         errY2 = y[x+1,1]
         #num = numpy.sqrt(numpy.square(errY1)+numpy.square(errY2))
         #denom = ytwo-yone
-        uncerty[x] = (1/(ttwo-tone))*numpy.sqrt((errY2**2)-(errY1**2))
+        uncerty[x] = (1/(ttwo-tone))*numpy.sqrt((errY2**2)+(errY1**2))
         
     #toReturn = numpy.concatenate((values,midtime,uncerty),axis=1)
     #toReturn = numpy.transpose(toReturn)
@@ -144,7 +143,8 @@ foo = derivative(t,a)
 bar = integral(t,a)    
 drms = rms(t,d)
     
-"""# Plotting Graph of a"""
+
+# Plotting Graph of a
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
@@ -153,7 +153,7 @@ p.errorbar(t,a[:,0],a[:,1],fmt='none',errorevery=1,label="Signal a")
 
 p.savefig('a.png',dpi=150,pad_inches=0.4) 
 
-"""# Plotting a^2"""
+# Plotting a^2
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
@@ -162,17 +162,17 @@ p.errorbar(t,mult[:,0],mult[:,1],fmt='none')
 
 p.savefig('asquare.png',dpi=150,pad_inches=0.4) 
 
-""" Plotting derivative of a """
+# Plotting derivative of a 
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
-p.ylabel(r'$ \frac{d}{dt} (signal) \left[ \displaystyle\frac{1}{s} \right] $',fontsize=16)
+p.ylabel(r'$ \frac{d}{dt} (signal) \left[ \frac{1}{s} \right] $',fontsize=16)
 p.errorbar(foo[:,0],foo[:,1],foo[:,2],fmt='none')
 
 p.savefig('aderiv.png',dpi=150,pad_inches=0.4) 
 
 
-""" Plotting integral of a """
+# Plotting integral of a
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
@@ -181,7 +181,7 @@ p.errorbar(t,bar[:,0],bar[:,1],fmt='none')
 
 p.savefig('aintegral.png',dpi=150,pad_inches=0.4) 
 
-""" Plotting Graph of d """
+# Plotting Graph of d 
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
@@ -190,7 +190,7 @@ p.errorbar(t,d[:,0],d[:,1],fmt='none')
 
 p.savefig('d.png',dpi=150,pad_inches=0.4) 
 
-""" Plotting rms of d """
+# Plotting rms of d 
 p.figure(figsize=(5,4), dpi=150)
 p.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 p.xlabel(r'Time [s]',fontsize=12)
@@ -198,7 +198,6 @@ p.ylabel(r'$RMS \ signal$',fontsize=12)
 p.errorbar(t,drms[:,0],drms[:,1],fmt='none')
 
 p.savefig('drms.png',dpi=150,pad_inches=0.4) 
-
 
 
 # I can verify correctness using known quantity
