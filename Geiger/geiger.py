@@ -103,4 +103,4 @@ def geiger(replicas=20, intervals=100, period=0.2, savefile="geiger.npz",graphic
         print("histogram saved to disk as '%s'."%(savefile))
     return h
             
-rc = geiger(replicas=20,intervals=64,period=0.2,graphics=True)
+rc = geiger(replicas=128,intervals=64,period=0.2,graphics=True)
