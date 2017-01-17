@@ -10,11 +10,13 @@ import matplotlib.pyplot as plt
 # Output: mean, mean of the array data
 def mean(trial):
 	tot = 0 
+	numDataPoints = 0
 	for i in range(len(trial)): 
 		# weighted
 		# adding 1 to index to avoid OBO
 		tot+=((i+1)*trial[i])
-	return (float)(tot/len(trial))
+		numDataPoints+=trial[i]
+	return (float)(tot/numDataPoints)
 
 # Input: trial, a 1D array of histogram data; 
 #		 mean, mean of the values in the array 
