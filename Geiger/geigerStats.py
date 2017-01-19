@@ -66,12 +66,15 @@ replicaGaussianDist = numpy.empty(len(geigerDataTransposed))
 overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
 for i in range(len(geigerDataTransposed)):
-    for j in range(len(geigerDataTransposed)):
-        replicaPoissonDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.poisson.pmf(i,overallMean)
-        replicaGaussianDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.norm.pdf(22,colVar[i],numpy.sqrt(colVar[i]))
+    replicaPoissonDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.poisson.pmf(i,overallMean)
+    # probability of getting 7 counts, with given mean (this works!)
+    replicaGaussianDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.norm.pdf(i,numpy.sqrt(colVar[i]),numpy.sqrt(colVar[i]))
+    # Gaussian looks ugly 
     
 xvals = numpy.linspace(0,21,num=22)
-plt.plot(xvals,replicaPoissonDist,'o')
+plt.plot(xvals,replicaGaussianDist,'o')
+#calculated values
+plt.plot(xvals,)
 #plt.plot(xvals,replicaGaussianDist,'o')
 
 
