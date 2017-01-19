@@ -44,12 +44,12 @@ def stdErr(trial,var):
 # Load data from run with average of 7
 geigerData7 = run7
 
+# Each bin is in a separate row 
 geigerDataTransposed = numpy.transpose(geigerData7)
 
 meanReplica = [mean(geigerData7[i]) for i in range(len(geigerData7))]
 replicaVarData = [variance(geigerData7[i],meanReplica[i]) for i in range(len(geigerData7))]
 replicaStdErr = [stdErr(geigerData7[i],replicaVarData[i]) for i in range(len(geigerData7))]
-
 
 ############Column Analysis##############
 # Transpose data to put the columns into rows (for ease of use)
@@ -66,40 +66,34 @@ replicaGaussianDist = numpy.empty(len(geigerDataTransposed))
 overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
 for i in range(len(geigerDataTransposed)):
-    replicaPoissonDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.poisson.pmf(i,overallMean)
+    replicaPoissonDist[i] = 6.4*numpy.sum(geigerDataTransposed[i])*scipy.stats.poisson.pmf(i,overallMean)
     # probability of getting 7 counts, with given mean (this works!)
     replicaGaussianDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.norm.pdf(i,numpy.sqrt(colVar[i]),numpy.sqrt(colVar[i]))
     # Gaussian looks ugly 
+ 
+# chi-p: difference between actual bin result and predicted Poisson bin result 
+# calculate for each bin (22 bins)
+
+observedBinCounts = numpy.empty(len(geigerDataTransposed))
+for i in range(len(geigerDataTransposed)):
+    observedBinCounts[i] = numpy.sum(geigerDataTransposed[i])
+
+   
+def compress(data):
+    # just compress every two rows
+    toReturn = numpy.zeros((len(data)/2,len(data[0])))
+    for i in range(len(data)/2):
+        toReturn[i] = numpy.add(data[i],data[i+1])
+        i+=2
+    return toReturn 
     
+compressed = compress(geigerData7)  
+
+  
+
 xvals = numpy.linspace(0,21,num=22)
-plt.plot(xvals,replicaGaussianDist,'o')
+plt.plot(xvals,replicaPoissonDist,'+')
+plt.plot(xvals,observedBinCounts,'o')
 #calculated values
-plt.plot(xvals,)
 #plt.plot(xvals,replicaGaussianDist,'o')
 
-
-
-"""
-# x values for plot 
-guessNumber = []
-# y values for plot 
-guessMeanFreq = []
-# error values 
-guessStdErr = []
-
-# only take the non-zero columns to add into the plot
-for i in range(geigerDataTransposed):
-    if(meanCol[i]!=0):
-        guessNumber.append(i+1)
-        guessMeanFreq.append(meanCol[i])
-        guessStdErr.append(colStdErr[i])
-
-# generating the plot 
-plt.plot(guessNumber,guessMeanFreq,'o')
-plt.figure(figsize=(8,8), dpi=100)
-plt.errorbar(guessNumber, guessMeanFreq,yerr=guessStdErr,fmt='o')
-plt.suptitle("Mean frequency of number of guesses",fontsize=20)
-plt.xlabel("Number of guesses",fontsize=16)
-plt.ylabel("Mean frequency",fontsize=16)
-plt.xlim(15,26)
-"""
