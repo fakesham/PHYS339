@@ -85,6 +85,7 @@ def geiger(replicas=20, intervals=100, period=0.2, savefile="geiger.npz",graphic
         p.xlabel("Events per %.3f s interval"%(period))
         p.ylabel("Frequency of observation")
     for i in range(replicas):
+        print("replica %d"%i)
         for k in range(intervals):
             if graphics:
                 for r in rectangles:
@@ -103,4 +104,4 @@ def geiger(replicas=20, intervals=100, period=0.2, savefile="geiger.npz",graphic
         print("histogram saved to disk as '%s'."%(savefile))
     return h
             
-rc = geiger(replicas=128,intervals=64,period=0.2,graphics=True)
+rc = geiger(replicas=128,intervals=64,period=0.2,graphics=False)
