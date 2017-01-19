@@ -89,6 +89,10 @@ def compress(data):
     
 compressed = compress(geigerData7)  
 
+for i in range(numpy.log2(len(geigerData7))):
+    # calculate/store chi square
+    # calculate/store poisson, Gaussian
+    # 
   
 
 xvals = numpy.linspace(0,21,num=22)
