@@ -1,5 +1,6 @@
 import numpy 
 import matplotlib.pyplot as plt 
+import scipy.stats
 #%matplotlib inline
 
 # 2D array 
@@ -20,7 +21,7 @@ def mean(trial):
     return float(numpy.divide(tot,numDataPoints))
 
 # Input: trial, a 1D array of histogram data; 
-#		 mean, mean of the values in the array 
+#        mean, mean of the values in the array 
 # Output: variance, variance of the array data
 def variance(trial, mean):
 	varSum = 0
@@ -33,14 +34,13 @@ def variance(trial, mean):
 # Input: trial, a 1D array of histogram data;
 #        var, the variance value for the data
 # Output: stdErr, standard error of the array data
-def rowStdErr(trial,var):
+def stdErr(trial,var):
     N = 0
     for i in range(len(trial)):
         N+=trial[i]
     return numpy.sqrt(var/N)
         
         
-
 # Load data from run with average of 7
 geigerData7 = run7
 
@@ -48,22 +48,35 @@ geigerDataTransposed = numpy.transpose(geigerData7)
 
 meanReplica = [mean(geigerData7[i]) for i in range(len(geigerData7))]
 replicaVarData = [variance(geigerData7[i],meanReplica[i]) for i in range(len(geigerData7))]
-replicaStdErr = [rowStdErr(geigerData7[i],replicaVarData[i]) for i in range(len(geigerData7))]
-
-print(replicaStdErr[0:10])
-
+replicaStdErr = [stdErr(geigerData7[i],replicaVarData[i]) for i in range(len(geigerData7))]
 
 
 ############Column Analysis##############
 # Transpose data to put the columns into rows (for ease of use)
-geigerDataTransposed = numpy.transpose(geigerData)
+geigerDataTransposed = numpy.transpose(geigerData7)
 # Mean values of each column in the original dataset
-# meanCol = [sum(geigerDataTransposed[i])/(len(geigerDataTransposed)) for i in range(len(geigerDataTransposed))]
-# Variances of each column in the original dataset 
-# varCol = [(sum(geigerDataTransposed[i]-meanCol[i])**2)/(len(geigerDataTransposed)) for i in range(geigerDataTransposed)] 
-# Standard error: take variance and mean for each column (calculated above)
-# colStdErr = [(float)(numpy.sqrt(varCol[i])/numpy.sqrt(len(geigerDataTransposed))) for i in range(geigerDataTransposed)]
+meanCol = [mean(geigerDataTransposed[i]) for i in range(len(geigerDataTransposed))]
+colVar = [variance(geigerDataTransposed[i],meanCol[i]) for i in range(len(geigerDataTransposed))]
+colStdErr = [stdErr(geigerDataTransposed[i],colVar[i]) for i in range(len(geigerDataTransposed))]
 
+replicaPoissonDist = numpy.empty(len(geigerDataTransposed))
+replicaGaussianDist = numpy.empty(len(geigerDataTransposed))
+
+# overall mean of all collected data 
+overallMean = numpy.sum(meanReplica)/len(meanReplica)
+
+for i in range(len(geigerDataTransposed)):
+    for j in range(len(geigerDataTransposed)):
+        replicaPoissonDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.poisson.pmf(i,overallMean)
+        replicaGaussianDist[i] = numpy.sum(geigerDataTransposed[i])*scipy.stats.norm.pdf(22,colVar[i],numpy.sqrt(colVar[i]))
+    
+xvals = numpy.linspace(0,21,num=22)
+plt.plot(xvals,replicaPoissonDist,'o')
+#plt.plot(xvals,replicaGaussianDist,'o')
+
+
+
+"""
 # x values for plot 
 guessNumber = []
 # y values for plot 
