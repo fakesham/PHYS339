@@ -147,7 +147,16 @@ def compress(data):
         bottomHalf[i]=data[i+len(data)/2]
     return numpy.add(topHalf,bottomHalf) 
 
-
+# Input: expChiSq, an expected chi square value 
+#        calcChiSq, a 1D array of calculated chi square values 
+# Output: the percentage of values in the 1D array greater than the expected chi square. 
+def gt(expChiSq,calcChiSq):
+    numGreater = 0; 
+    for i in range(len(calcChiSq)):
+        if(calcChiSq[i]>expChiSq):
+            numGreater+=1
+            
+    return 100*numpy.divide(float(numGreater),float(len(calcChiSq)))
 
 # Compressed data sets 
 geigerData7_64 = compress(geigerData7)
@@ -160,60 +169,97 @@ geigerData7_1 = compress(geigerData7_2)
 
 # All distributions and chi-squared values for each compressed data set 
 
+cv = colVar
+
 # 128 trials
 poisson128 = findPoisson(geigerData7)
-csp128 = chiSquare(geigerData7,poisson128,colVar) 
+csp128 = chiSquare(geigerData7,poisson128,cv) 
 gaussian128 = findGaussian(geigerData7)
-csg128 = chiSquare(geigerData7,gaussian128,colVar)
+csg128 = chiSquare(geigerData7,gaussian128,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 64 trials 
 poisson64 = findPoisson(geigerData7_64)
-csp64 = chiSquare(geigerData7_64,poisson64,colVar) 
+csp64 = chiSquare(geigerData7_64,poisson64,cv) 
 gaussian64 = findGaussian(geigerData7_64)
-csg64 = chiSquare(geigerData7_64,gaussian64,colVar)
+csg64 = chiSquare(geigerData7_64,gaussian64,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 32 trials 
 poisson32 = findPoisson(geigerData7_32)
-csp32 = chiSquare(geigerData7_32,poisson32,colVar) 
+csp32 = chiSquare(geigerData7_32,poisson32,cv) 
 gaussian32 = findGaussian(geigerData7_32)
-csg32 = chiSquare(geigerData7_32,gaussian32,colVar)
+csg32 = chiSquare(geigerData7_32,gaussian32,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 16 trials 
 poisson16 = findPoisson(geigerData7_16)
-csp16 = chiSquare(geigerData7_16,poisson16,colVar) 
+csp16 = chiSquare(geigerData7_16,poisson16,cv) 
 gaussian16 = findGaussian(geigerData7_16)
-csg16 = chiSquare(geigerData7_16,gaussian16,colVar)
+csg16 = chiSquare(geigerData7_16,gaussian16,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 8 trials 
 poisson8 = findPoisson(geigerData7_8)
-csp8 = chiSquare(geigerData7_8,poisson8,colVar) 
+csp8 = chiSquare(geigerData7_8,poisson8,cv) 
 gaussian8 = findGaussian(geigerData7_8)
-csg8 = chiSquare(geigerData7_8,gaussian8,colVar)
+csg8 = chiSquare(geigerData7_8,gaussian8,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 4 trials 
 poisson4 = findPoisson(geigerData7_4)
-csp4 = chiSquare(geigerData7_4,poisson4,colVar) 
+csp4 = chiSquare(geigerData7_4,poisson4,cv) 
 gaussian4 = findGaussian(geigerData7_4)
-csg4 = chiSquare(geigerData7_4,gaussian4,colVar) 
+csg4 = chiSquare(geigerData7_4,gaussian4,cv) 
+
+cv = cv/numpy.sqrt(2)
+
 # 2 trials 
 poisson2 = findPoisson(geigerData7_2)
-csp2 = chiSquare(geigerData7_2,poisson2,colVar) 
+csp2 = chiSquare(geigerData7_2,poisson2,cv) 
 gaussian2 = findGaussian(geigerData7_2)
-csg2 = chiSquare(geigerData7_2,gaussian2,colVar)
+csg2 = chiSquare(geigerData7_2,gaussian2,cv)
+
+cv = cv/numpy.sqrt(2)
+
 # 1 trial
 poisson1 = findPoisson(geigerData7_1)
-csp1 = chiSquare(geigerData7_1,poisson1,colVar) 
+csp1 = chiSquare(geigerData7_1,poisson1,cv) 
 gaussian1 = findGaussian(geigerData7_1)
-csg1 = chiSquare(geigerData7_1,gaussian1,colVar)
+csg1 = chiSquare(geigerData7_1,gaussian1,cv)
 
 
+# expected chi-square 
+poissonChiSq = scipy.stats.chi2.isf(0.125,21)
+gaussianChiSq = scipy.stats.chi2.isf(0.125,20)
+
+p128 = gt(poissonChiSq,csp128)
+p64 = gt(poissonChiSq,csp64) 
+p32 = gt(poissonChiSq,csp32) 
+p16 = gt(poissonChiSq,csp16) 
+p8 = gt(poissonChiSq,csp8) 
+p4 = gt(poissonChiSq,csp4) 
+p2 = gt(poissonChiSq,csp2) 
+p1 = gt(poissonChiSq,csp1)
 
 
+print("Poisson distribution for 21 degrees of freedom: \n12.5 percent of values must be greater than %f\n"%(poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(128,64, p128, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(64,128, p64, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(32,256, p32, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(16,512, p16, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(8,1024, p8, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(4,2048, p4, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,5096, p2, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,10192, p1, poissonChiSq))
 
 
-
-
-
-
-
-
-
-
+# print("Gaussian distribution for 20 degrees of freedom: \n12.5 percent of values must be greater than %f"%(gaussianChiSq))
 
 """
 # g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
