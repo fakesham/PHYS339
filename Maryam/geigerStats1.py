@@ -66,7 +66,7 @@ def colMean(trials):
 #        means, a 1D array of the means of each row in trials
 # Output: 1D array containing the variance of each row in trials. 
 def colVar(trials,means):
-    return [float((sum(trials[i] - means[i])**2)/(len(trials))) for i in range(len(trials))]
+    return [float(sum((trials[i] - means[i])**2)/(len(trials))) for i in range(len(trials))]
   
 # Input: trials, a 2D array of histogram data; 
 #        variances, a 1D array of the variances of each row in trials
@@ -80,23 +80,59 @@ colVar = colVar(geigerDataTransposed,colMean)
 colStdErr = colStdErr(geigerDataTransposed,colVar)
 
 
-# i think it must be geigerData7 because we need the distribution for all 128 replicas 
 replicaPoissonDist = numpy.empty(len(geigerData7))
 replicaGaussianDist = numpy.empty(len(geigerData7))
-"""
+
+
+
 # overall mean of all collected data 
 overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
 ####parameters of the distributions are calculated from each replica#####
 ### we must get 128 distributions####
 # do we have to also exclude the ones with variance 0?#
+
+# for the first trial 
+# mean mu 
+# variance sigma 
+# generate a Poisson distribution 
+
+# Input: a 2D array of trials, where each separate trial is a row
+# Output: a 2D array of the expected values for each trial and bin, 
+#         based on the Poisson distribution. 
+def findPoisson(trials):
+    poisson = numpy.empty((len(trials),len(trials[0])))
+    
+    for j in range(len(trials)):
+        for i in range(len(trials[j])):
+            poisson[j][i] = numpy.sum(trials[j])*scipy.stats.poisson.pmf(i,mean(trials[j]))
+    return poisson
+
+# Input: a 2D array of trials, where each separate trial is a row
+# Output: a 2D array of the expected values for each trial and bin, 
+#         based on the Gaussian distribution.           
+def findGaussian(trials):
+    gaussian = numpy.empty((len(trials),len(trials[0])))
+
+    for j in range(len(trials)):
+        for i in range(len(trials[j])):
+            gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j])))
+    return gaussian 
+    
+# xvals = numpy.arange(0,22,1) 
+
+poisson128 = findPoisson(geigerData7)
+gaussian128 = findGaussian(geigerData7)
+
+
+
+"""
 for i in range(len(geigerData7)):
     #the probability of getting i counts in a time interval 
-    replicaPoissonDist = numpy.sum(geigerData7[i])*scipy.stats.poisson.pmf(i,meanReplica[i])
-    replicaGaussianDist = numpy.sum(geigerData7[i])*scipy.stats.norm.pdf(i,numpy.sqrt(replicaVarData[i]),numpy.sqrt(replicaVarData[i]))
-    #  multiply it by the number of points in your data set (64) because the functions are normalized to unit area.
+    replicaPoissonDist[i] = numpy.sum(geigerData7[i])*scipy.stats.poisson.pmf(i,meanReplica[i])
+    replicaGaussianDist[i] = numpy.sum(geigerData7[i])*scipy.stats.norm.pdf(i,meanReplica[i],numpy.sqrt(replicaVarData[i]))
     # gaussian with a small mean requires a different normalization scipy.stats.norm.sf(b,meanReplica,numpy.sqrt(replicaVarData))
- 
+
 observedBinCounts = numpy.empty(len(geigerDataTransposed))
 for i in range(len(geigerDataTransposed)):
     observedBinCounts[i] = numpy.sum(geigerDataTransposed[i])
