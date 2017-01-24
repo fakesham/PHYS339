@@ -116,7 +116,7 @@ def findGaussian(trials):
 
     for j in range(len(trials)):
         for i in range(len(trials[j])):
-            gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j])))
+            gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j]))))
     return gaussian 
     
 # xvals = numpy.arange(0,22,1) 
@@ -124,30 +124,37 @@ def findGaussian(trials):
 poisson128 = findPoisson(geigerData7)
 gaussian128 = findGaussian(geigerData7)
 
+# Input: observed, a 2D array of observed data;
+#        expected, a 2D array of expected values based on a PDF or PMF
+#        variance, a 1D array of the variance in each bin calculated globally 
+# Output: a 1D array of the chi-square values for each row (trial).
+def chiSquare(observed,expected,variance):
+    chisq = numpy.empty(len(observed))
+    
+    for i in range(len(observed)): 
+        chisqTot = 0 
+        for j in range(len(observed[i])):
+            chisqTot+=(observed[i][j]-expected[i][j])**2/variance[j]
+        chisq[i] = chisqTot
+    
+    return chisq
+                
+        
+csp128 = chiSquare(geigerData7,poisson128,colVar) 
+csg128 = chiSquare(geigerData7,gaussian128,colVar)
+
+def compress(data):
+    # just compress every two rows
+    topHalf = numpy.empty((len(data)/2,len(data[0])))
+    bottomHalf = numpy.empty((len(data)/2,len(data[0])))
+    for i in range(len(data)/2):
+        topHalf[i]=data[i]
+    for i in range(0,len(data)/2):
+        bottomHalf[i]=data[i+len(data)/2]
+    return numpy.sum(topHalf,bottomHalf) 
 
 
 """
-for i in range(len(geigerData7)):
-    #the probability of getting i counts in a time interval 
-    replicaPoissonDist[i] = numpy.sum(geigerData7[i])*scipy.stats.poisson.pmf(i,meanReplica[i])
-    replicaGaussianDist[i] = numpy.sum(geigerData7[i])*scipy.stats.norm.pdf(i,meanReplica[i],numpy.sqrt(replicaVarData[i]))
-    # gaussian with a small mean requires a different normalization scipy.stats.norm.sf(b,meanReplica,numpy.sqrt(replicaVarData))
-
-observedBinCounts = numpy.empty(len(geigerDataTransposed))
-for i in range(len(geigerDataTransposed)):
-    observedBinCounts[i] = numpy.sum(geigerDataTransposed[i])
-
- # twice the number of intervals per replica.
-def compress(data):
-    # just compress every two rows
-    toReturn = numpy.zeros((len(data)/2,len(data[0])))
-    for i in range(len(data)/2):
-        toReturn[i] = numpy.add(data[i],data[i+1])
-        i+=2
-    return toReturn 
-    
-compressed1 = compress(geigerData7)  
-
 # g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
 # calculate for each bin (22 bins)
 # 128 x 22
@@ -162,6 +169,19 @@ def chiSquare (data,var,pdf):
 # what is the error on each bin ? difficult!!!
 g-chiSquare = [chiSquare(compressed1, replicaVarData, replicaGaussianDist) for i in range(compressed1)] 
 p-chiSquare = [chiSquare(compressed2, replicaVarData, replicaPoissonDist) for i in range(compressed1)]
+
+"""
+"""
+observedBinCounts = numpy.empty(len(geigerDataTransposed))
+for i in range(len(geigerDataTransposed)):
+    observedBinCounts[i] = numpy.sum(geigerDataTransposed[i])
+
+ # twice the number of intervals per replica.
+
+    
+compressed1 = compress(geigerData7)  
+
+
 
 
 # we must see that the result is noisy must either increase the number of intervals more than 64 or add replicas together
