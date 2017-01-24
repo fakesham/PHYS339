@@ -56,14 +56,34 @@ replicaStdErr = [stdErr(geigerData7[i],replicaVarData[i]) for i in range(len(gei
 geigerDataTransposed = numpy.transpose(geigerData7)
 # Mean values of each column in the original dataset
 #the mean and variance should not be weighted!
-meanCol = [float(sum(geigerDataTransposed[i])/(len(geigerDataTransposed))) for i in range(len(geigerDataTransposed))]
-colVar = [float((sum(geigerDataTransposed[i] - meanCol[i])**2)/(len(geigerDataTransposed))) for i in range(len(geigerDataTransposed))]
-colStdErr = [stdErr(geigerDataTransposed[i],colVar[i]) for i in range(len(geigerDataTransposed))]
+
+# Input: trials, a 2D array of histogram data 
+# Output: 1D array containing the mean of each row. 
+def colMean(trials):
+    return [float(sum(trials[i]))/float(len(trials[i])) for i in range(len(trials))]
+
+# Input: trials, a 2D array of histogram data; 
+#        means, a 1D array of the means of each row in trials
+# Output: 1D array containing the variance of each row in trials. 
+def colVar(trials,means):
+    return [float((sum(trials[i] - means[i])**2)/(len(trials))) for i in range(len(trials))]
+  
+# Input: trials, a 2D array of histogram data; 
+#        variances, a 1D array of the variances of each row in trials
+# Output: a 1D array containing the standard error of each row in trials.   
+def colStdErr(trials,variances):
+    return [numpy.sqrt(numpy.divide(variances[i],len(trials[i]))) for i in range(len(trials))]
+        
+
+colMean = colMean(geigerDataTransposed)
+colVar = colVar(geigerDataTransposed,colMean)
+colStdErr = colStdErr(geigerDataTransposed,colVar)
+
 
 # i think it must be geigerData7 because we need the distribution for all 128 replicas 
 replicaPoissonDist = numpy.empty(len(geigerData7))
 replicaGaussianDist = numpy.empty(len(geigerData7))
-
+"""
 # overall mean of all collected data 
 overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
@@ -122,4 +142,4 @@ plt.plot(xvals,replicaPoissonDist,'+')
 plt.plot(xvals,observedBinCounts,'o')
 #calculated values
 #plt.plot(xvals,replicaGaussianDist,'o')
-
+"""
