@@ -29,7 +29,7 @@ def variance(trial, mean):
 		# must be weighted 
 		# adding 1 to index to avoid OBO
 		varSum += (trial[j])*(j-mean)**2
-	return float(numpy.divide(varSum,(len(trial)-1)))
+	return float(numpy.divide(varSum,(numpy.sum(trial))))
 
 # Input: trial, a 1D array of histogram data;
 #        var, the variance value for the data
@@ -42,6 +42,11 @@ def stdErr(trial,var):
               
 # Load data from run with average of 7
 geigerData7 = run7
+# Load sample data 
+s = sample
+
+sampleMean = [mean(s[i]) for i in range(len(s))]
+sampleVar = [variance(s[i],sampleMean[i]) for i in range(len(s))]
 
 # Each bin is in a separate row 
 geigerDataTransposed = numpy.transpose(geigerData7)
@@ -54,30 +59,36 @@ replicaStdErr = [stdErr(geigerData7[i],replicaVarData[i]) for i in range(len(gei
 
 # Transpose data to put the columns into rows (for ease of use)
 geigerDataTransposed = numpy.transpose(geigerData7)
+sTranspose = numpy.transpose(s)
+
 # Mean values of each column in the original dataset
 #the mean and variance should not be weighted!
 
 # Input: trials, a 2D array of histogram data 
 # Output: 1D array containing the mean of each row. 
-def colMean(trials):
+def cMean(trials):
     return [float(sum(trials[i]))/float(len(trials[i])) for i in range(len(trials))]
 
 # Input: trials, a 2D array of histogram data; 
 #        means, a 1D array of the means of each row in trials
 # Output: 1D array containing the variance of each row in trials. 
-def colVar(trials,means):
-    return [float(sum((trials[i] - means[i])**2)/(len(trials))) for i in range(len(trials))]
+def cVar(trials,means):
+    return [float(sum((trials[i] - means[i])**2))/float(len(trials[i])) for i in range(len(trials))]
   
 # Input: trials, a 2D array of histogram data; 
 #        variances, a 1D array of the variances of each row in trials
 # Output: a 1D array containing the standard error of each row in trials.   
-def colStdErr(trials,variances):
+def cStdErr(trials,variances):
     return [numpy.sqrt(numpy.divide(variances[i],len(trials[i]))) for i in range(len(trials))]
         
 
-colMean = colMean(geigerDataTransposed)
-colVar = colVar(geigerDataTransposed,colMean)
-colStdErr = colStdErr(geigerDataTransposed,colVar)
+colMean = cMean(geigerDataTransposed)
+colVar = cVar(geigerDataTransposed,colMean)
+colStdErr = cStdErr(geigerDataTransposed,colVar)
+
+
+sampleColMean = cMean(sTranspose)
+sampleColVar = cVar(sTranspose,sampleColMean)
 
 
 replicaPoissonDist = numpy.empty(len(geigerData7))
@@ -118,11 +129,14 @@ def findGaussian(trials):
         for i in range(len(trials[j])):
             gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j]))))
     return gaussian 
-    
+  
+  
 # Input: observed, a 2D array of observed data;
 #        expected, a 2D array of expected values based on a PDF or PMF
 #        variance, a 1D array of the variance in each bin calculated globally 
 # Output: a 1D array of the chi-square values for each row (trial).
+
+"""
 def chiSquare(observed,expected,variance):
     chisq = numpy.empty(len(observed))
     
@@ -133,7 +147,20 @@ def chiSquare(observed,expected,variance):
         chisq[i] = chisqTot
     
     return chisq
-                
+    
+"""
+def chiSquare(observed,expected,variance):
+    chisq = numpy.empty(len(observed))
+    
+    for i in range(len(observed)): 
+        chisqTot = 0 
+        for j in range(len(observed[i])):
+            chisqTot+=(observed[i][j]-expected[i][j])**2/expected[i][j]
+        chisq[i] = chisqTot
+    
+    return chisq                
+
+
 
 # Input: data, a 2D array of observed data 
 # Output: a 2D array of observed data, with half the number of trials 
@@ -260,6 +287,9 @@ print("%d replicas with %d intervals each: %f percent of values greater than %f"
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,4096, p2, poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, p1, poissonChiSq))
 
+
+print("\n\n\n\n\n")
+
 g1 = gt(gaussianChiSq, csg1)
 g2 = gt(gaussianChiSq, csg2)
 g4 = gt(gaussianChiSq, csg4)
@@ -269,7 +299,7 @@ g32 = gt(gaussianChiSq, csg32)
 g64 = gt(gaussianChiSq, csg64)
 g128 = gt(gaussianChiSq, csg128)
 
-print("Gaussian distribution for 20 degrees of freedom: \n12.5 percent of values must be greater than \%f\n"%(poissonChiSq))
+print("Gaussian distribution for 20 degrees of freedom: \n12.5 percent of values must be greater than %f\n"%(gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(128,64, g128, gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(64,128, g64, gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(32,256, g32, gaussianChiSq))
