@@ -238,6 +238,8 @@ csg1 = chiSquare(geigerData7_1,gaussian1,cv)
 poissonChiSq = scipy.stats.chi2.isf(0.125,21)
 gaussianChiSq = scipy.stats.chi2.isf(0.125,20)
 
+
+# gt -> greater than 
 p128 = gt(poissonChiSq,csp128)
 p64 = gt(poissonChiSq,csp64) 
 p32 = gt(poissonChiSq,csp32) 
@@ -255,11 +257,30 @@ print("%d replicas with %d intervals each: %f percent of values greater than %f"
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(16,512, p16, poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(8,1024, p8, poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(4,2048, p4, poissonChiSq))
-print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,5096, p2, poissonChiSq))
-print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,10192, p1, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,4096, p2, poissonChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, p1, poissonChiSq))
+
+p1 = gt(gaussianChiSq, csg1)
+p2 = gt(gaussianChiSq, csg2)
+p4 = gt(gaussianChiSq, csg4)
+p8 = gt(gaussianChiSq, csg8)
+p16 = gt(gaussianChiSq, csg16)
+p32 = gt(gaussianChiSq, csg32)
+p64 = gt(gaussianChiSq, csg64)
+p128 = gt(gaussianChiSq, csg128)
 
 
-# print("Gaussian distribution for 20 degrees of freedom: \n12.5 percent of values must be greater than %f"%(gaussianChiSq))
+print("Gaussian distribution for 20 degrees of freedom: \n12.5 percent of values must be greater than \%f\n"%(poissonChiSq))
+
+
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(128,64, p128, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(64,128, p64, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(32,256, p32, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(16,512, p16, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(8,1024, p8, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(4,2048, p4, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,4096, p2, gaussianChiSq))
+print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, p1, gaussianChiSq))
 
 """
 # g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
