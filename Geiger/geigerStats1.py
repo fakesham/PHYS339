@@ -136,7 +136,7 @@ def findGaussian(trials):
 #        variance, a 1D array of the variance in each bin calculated globally 
 # Output: a 1D array of the chi-square values for each row (trial).
 
-"""
+
 def chiSquare(observed,expected,variance):
     chisq = numpy.empty(len(observed))
     
@@ -159,8 +159,7 @@ def chiSquare(observed,expected,variance):
         chisq[i] = chisqTot
     
     return chisq                
-
-
+"""
 
 # Input: data, a 2D array of observed data 
 # Output: a 2D array of observed data, with half the number of trials 
@@ -204,7 +203,7 @@ csp128 = chiSquare(geigerData7,poisson128,cv)
 gaussian128 = findGaussian(geigerData7)
 csg128 = chiSquare(geigerData7,gaussian128,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 64 trials 
 poisson64 = findPoisson(geigerData7_64)
@@ -212,7 +211,7 @@ csp64 = chiSquare(geigerData7_64,poisson64,cv)
 gaussian64 = findGaussian(geigerData7_64)
 csg64 = chiSquare(geigerData7_64,gaussian64,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 32 trials 
 poisson32 = findPoisson(geigerData7_32)
@@ -220,7 +219,7 @@ csp32 = chiSquare(geigerData7_32,poisson32,cv)
 gaussian32 = findGaussian(geigerData7_32)
 csg32 = chiSquare(geigerData7_32,gaussian32,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 16 trials 
 poisson16 = findPoisson(geigerData7_16)
@@ -228,7 +227,7 @@ csp16 = chiSquare(geigerData7_16,poisson16,cv)
 gaussian16 = findGaussian(geigerData7_16)
 csg16 = chiSquare(geigerData7_16,gaussian16,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 8 trials 
 poisson8 = findPoisson(geigerData7_8)
@@ -236,7 +235,7 @@ csp8 = chiSquare(geigerData7_8,poisson8,cv)
 gaussian8 = findGaussian(geigerData7_8)
 csg8 = chiSquare(geigerData7_8,gaussian8,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 4 trials 
 poisson4 = findPoisson(geigerData7_4)
@@ -244,7 +243,7 @@ csp4 = chiSquare(geigerData7_4,poisson4,cv)
 gaussian4 = findGaussian(geigerData7_4)
 csg4 = chiSquare(geigerData7_4,gaussian4,cv) 
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 2 trials 
 poisson2 = findPoisson(geigerData7_2)
@@ -252,7 +251,7 @@ csp2 = chiSquare(geigerData7_2,poisson2,cv)
 gaussian2 = findGaussian(geigerData7_2)
 csg2 = chiSquare(geigerData7_2,gaussian2,cv)
 
-cv = cv/numpy.sqrt(2)
+cv = numpy.multiply(cv,2)
 
 # 1 trial
 poisson1 = findPoisson(geigerData7_1)
@@ -288,7 +287,7 @@ print("%d replicas with %d intervals each: %f percent of values greater than %f"
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, p1, poissonChiSq))
 
 
-print("\n\n\n\n\n")
+print("\n\n")
 
 g1 = gt(gaussianChiSq, csg1)
 g2 = gt(gaussianChiSq, csg2)
@@ -308,6 +307,11 @@ print("%d replicas with %d intervals each: %f percent of values greater than %f"
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(4,2048, g4, gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,4096, g2, gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, g1, gaussianChiSq))
+
+### PLOTS ### 
+totalBinCounts = [sum(geigerDataTransposed[i]) for i in range(len(geigerDataTransposed))] 
+x = plt.hist(totalBinCounts,bins=22)
+
 """
 # g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
 # calculate for each bin (22 bins)
