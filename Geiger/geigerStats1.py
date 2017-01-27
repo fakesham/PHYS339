@@ -41,7 +41,7 @@ def stdErr(trial,var):
     return numpy.sqrt(var/N)
               
 # Load data from run with average of 7
-geigerData7 = run7
+gData = run7
 # Load sample data 
 s = sample
 
@@ -49,16 +49,16 @@ sampleMean = [mean(s[i]) for i in range(len(s))]
 sampleVar = [variance(s[i],sampleMean[i]) for i in range(len(s))]
 
 # Each bin is in a separate row 
-geigerDataTransposed = numpy.transpose(geigerData7)
+geigerDataTransposed = numpy.transpose(gData)
 
-meanReplica = [mean(geigerData7[i]) for i in range(len(geigerData7))]
-replicaVarData = [variance(geigerData7[i],meanReplica[i]) for i in range(len(geigerData7))]
-replicaStdErr = [stdErr(geigerData7[i],replicaVarData[i]) for i in range(len(geigerData7))]
+meanReplica = [mean(gData[i]) for i in range(len(gData))]
+replicaVarData = [variance(gData[i],meanReplica[i]) for i in range(len(gData))]
+replicaStdErr = [stdErr(gData[i],replicaVarData[i]) for i in range(len(gData))]
 
 ############Column Analysis##############
 
 # Transpose data to put the columns into rows (for ease of use)
-geigerDataTransposed = numpy.transpose(geigerData7)
+geigerDataTransposed = numpy.transpose(gData)
 sTranspose = numpy.transpose(s)
 
 # Mean values of each column in the original dataset
@@ -91,8 +91,8 @@ sampleColMean = cMean(sTranspose)
 sampleColVar = cVar(sTranspose,sampleColMean)
 
 
-replicaPoissonDist = numpy.empty(len(geigerData7))
-replicaGaussianDist = numpy.empty(len(geigerData7))
+replicaPoissonDist = numpy.empty(len(gData))
+replicaGaussianDist = numpy.empty(len(gData))
 
 
 
@@ -185,85 +185,87 @@ def gt(expChiSq,calcChiSq):
     return 100*numpy.divide(float(numGreater),float(len(calcChiSq)))
 
 # Compressed data sets 
-geigerData7_64 = compress(geigerData7)
-geigerData7_32 = compress(geigerData7_64)
-geigerData7_16 = compress(geigerData7_32)
-geigerData7_8 = compress(geigerData7_16)
-geigerData7_4 = compress(geigerData7_8)
-geigerData7_2 = compress(geigerData7_4)
-geigerData7_1 = compress(geigerData7_2)
+gData_64 = compress(gData)
+gData_32 = compress(gData_64)
+gData_16 = compress(gData_32)
+gData_8 = compress(gData_16)
+gData_4 = compress(gData_8)
+gData_2 = compress(gData_4)
+gData_1 = compress(gData_2)
 
 # All distributions and chi-squared values for each compressed data set 
 
 cv = colVar
 
 # 128 trials
-poisson128 = findPoisson(geigerData7)
-csp128 = chiSquare(geigerData7,poisson128,cv) 
-gaussian128 = findGaussian(geigerData7)
-csg128 = chiSquare(geigerData7,gaussian128,cv)
+poisson128 = findPoisson(gData)
+csp128 = chiSquare(gData,poisson128,cv) 
+gaussian128 = findGaussian(gData)
+csg128 = chiSquare(gData,gaussian128,cv)
 
-cv = numpy.multiply(cv,2)
+cv = cVar(gData_64, colMean)
 
 # 64 trials 
-poisson64 = findPoisson(geigerData7_64)
-csp64 = chiSquare(geigerData7_64,poisson64,cv) 
-gaussian64 = findGaussian(geigerData7_64)
-csg64 = chiSquare(geigerData7_64,gaussian64,cv)
+poisson64 = findPoisson(gData_64)
+csp64 = chiSquare(gData_64,poisson64,cv) 
+gaussian64 = findGaussian(gData_64)
+csg64 = chiSquare(gData_64,gaussian64,cv)
 
-cv = numpy.multiply(cv,2)
+cv = cVar(gData_32, colMean)
 
 # 32 trials 
-poisson32 = findPoisson(geigerData7_32)
-csp32 = chiSquare(geigerData7_32,poisson32,cv) 
-gaussian32 = findGaussian(geigerData7_32)
-csg32 = chiSquare(geigerData7_32,gaussian32,cv)
+poisson32 = findPoisson(gData_32)
+csp32 = chiSquare(gData_32,poisson32,cv) 
+gaussian32 = findGaussian(gData_32)
+csg32 = chiSquare(gData_32,gaussian32,cv)
 
-cv = numpy.multiply(cv,2)
+cv = cVar(gData_16, colMean)
 
 # 16 trials 
-poisson16 = findPoisson(geigerData7_16)
-csp16 = chiSquare(geigerData7_16,poisson16,cv) 
-gaussian16 = findGaussian(geigerData7_16)
-csg16 = chiSquare(geigerData7_16,gaussian16,cv)
+poisson16 = findPoisson(gData_16)
+csp16 = chiSquare(gData_16,poisson16,cv) 
+gaussian16 = findGaussian(gData_16)
+csg16 = chiSquare(gData_16,gaussian16,cv)
 
-cv = numpy.multiply(cv,2)
+cv = cVar(gData_8, colMean)
 
 # 8 trials 
-poisson8 = findPoisson(geigerData7_8)
-csp8 = chiSquare(geigerData7_8,poisson8,cv) 
-gaussian8 = findGaussian(geigerData7_8)
-csg8 = chiSquare(geigerData7_8,gaussian8,cv)
+poisson8 = findPoisson(gData_8)
+csp8 = chiSquare(gData_8,poisson8,cv) 
+gaussian8 = findGaussian(gData_8)
+csg8 = chiSquare(gData_8,gaussian8,cv)
 
-cv = numpy.multiply(cv,2)
+cVar(gData_4, colMean)
 
 # 4 trials 
-poisson4 = findPoisson(geigerData7_4)
-csp4 = chiSquare(geigerData7_4,poisson4,cv) 
-gaussian4 = findGaussian(geigerData7_4)
-csg4 = chiSquare(geigerData7_4,gaussian4,cv) 
+poisson4 = findPoisson(gData_4)
+csp4 = chiSquare(gData_4,poisson4,cv) 
+gaussian4 = findGaussian(gData_4)
+csg4 = chiSquare(gData_4,gaussian4,cv) 
 
-cv = numpy.multiply(cv,2)
+cVar(gData_2, colMean)
 
 # 2 trials 
-poisson2 = findPoisson(geigerData7_2)
-csp2 = chiSquare(geigerData7_2,poisson2,cv) 
-gaussian2 = findGaussian(geigerData7_2)
-csg2 = chiSquare(geigerData7_2,gaussian2,cv)
+poisson2 = findPoisson(gData_2)
+csp2 = chiSquare(gData_2,poisson2,cv) 
+gaussian2 = findGaussian(gData_2)
+csg2 = chiSquare(gData_2,gaussian2,cv)
 
-cv = numpy.multiply(cv,2)
+cVar(gData_1, colMean)
 
 # 1 trial
-poisson1 = findPoisson(geigerData7_1)
-csp1 = chiSquare(geigerData7_1,poisson1,cv) 
-gaussian1 = findGaussian(geigerData7_1)
-csg1 = chiSquare(geigerData7_1,gaussian1,cv)
+poisson1 = findPoisson(gData_1)
+csp1 = chiSquare(gData_1,poisson1,cv) 
+gaussian1 = findGaussian(gData_1)
+csg1 = chiSquare(gData_1,gaussian1,cv)
 
 
 # expected chi-square 
 poissonChiSq = scipy.stats.chi2.isf(0.125,21)
 gaussianChiSq = scipy.stats.chi2.isf(0.125,20)
 
+
+for i in range(numpy.log2(len(gData))):
 
 # gt -> greater than 
 p128 = gt(poissonChiSq,csp128)
@@ -337,7 +339,7 @@ for i in range(len(geigerDataTransposed)):
  # twice the number of intervals per replica.
 
     
-compressed1 = compress(geigerData7)  
+compressed1 = compress(gData)  
 
 
 
