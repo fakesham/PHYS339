@@ -9,6 +9,8 @@ import scipy.stats
 
 #################################### ROW FUNCTIONS ####################################
   
+# Input: trial, a 1D array of histogram data
+# Output: a single value, the mean of the 1D array 
 def mean(trial):
     tot = 0
     numDataPoints = 0
