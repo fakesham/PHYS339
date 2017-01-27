@@ -160,7 +160,7 @@ numBins = len(gDataTransposed)
 totalDOF = 0
 for i in range(len(gDataTransposed)):
     if(numpy.sum(gDataTransposed[i])!=0):
-        totalDOF++
+        totalDOF+=1
 
 # Row calculations 
 meanReplica = [mean(gData[i]) for i in range(len(gData))]
