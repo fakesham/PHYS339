@@ -222,8 +222,8 @@ for i in range(reps):
 #################################### PRINT STATEMENTS ####################################
 
 # Poisson 
-print("Poisson distribution for %d degrees of freedom:")
-print("12.5% of values must be greater than %f\n"%(len(gDataTransposed)-1,poissonChiSq))
+print("Poisson distribution for %d degrees of freedom:"%len(gDataTransposed)-1)
+print("12.5% of values must be greater than %f\n"%(poissonChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
@@ -233,8 +233,8 @@ for i in range(reps):
 
 
 # Gaussian
-print("Gaussian distribution for %d degrees of freedom:")
-print("12.5% of values must be greater than %f\n"%(len(gDataTransposed)-2,gaussianChiSq))
+print("Gaussian distribution for %d degrees of freedom:"%len(gDataTransposed)-2)
+print("12.5% of values must be greater than %f\n"%(gaussianChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
