@@ -7,7 +7,7 @@ import scipy.stats
 # 128 rows 
 # 22 columns 
 
-#########ROW ANALYSIS##########
+#################################### ROW FUNCTIONS ####################################
   
 def mean(trial):
     tot = 0
@@ -40,29 +40,9 @@ def stdErr(trial,var):
         N+=trial[i]
     return numpy.sqrt(var/N)
               
-# Load data from run with average of 7
-gData = run7
-# Load sample data 
-s = sample
 
-sampleMean = [mean(s[i]) for i in range(len(s))]
-sampleVar = [variance(s[i],sampleMean[i]) for i in range(len(s))]
 
-# Each bin is in a separate row 
-geigerDataTransposed = numpy.transpose(gData)
-
-meanReplica = [mean(gData[i]) for i in range(len(gData))]
-replicaVarData = [variance(gData[i],meanReplica[i]) for i in range(len(gData))]
-replicaStdErr = [stdErr(gData[i],replicaVarData[i]) for i in range(len(gData))]
-
-############Column Analysis##############
-
-# Transpose data to put the columns into rows (for ease of use)
-geigerDataTransposed = numpy.transpose(gData)
-sTranspose = numpy.transpose(s)
-
-# Mean values of each column in the original dataset
-#the mean and variance should not be weighted!
+#################################### COLUMN FUNCTIONS ####################################
 
 # Input: trials, a 2D array of histogram data 
 # Output: 1D array containing the mean of each row. 
@@ -80,33 +60,10 @@ def cVar(trials,means):
 # Output: a 1D array containing the standard error of each row in trials.   
 def cStdErr(trials,variances):
     return [numpy.sqrt(numpy.divide(variances[i],len(trials[i]))) for i in range(len(trials))]
-        
-
-colMean = cMean(geigerDataTransposed)
-colVar = cVar(geigerDataTransposed,colMean)
-colStdErr = cStdErr(geigerDataTransposed,colVar)
-
-
-sampleColMean = cMean(sTranspose)
-sampleColVar = cVar(sTranspose,sampleColMean)
-
-
-replicaPoissonDist = numpy.empty(len(gData))
-replicaGaussianDist = numpy.empty(len(gData))
 
 
 
-# overall mean of all collected data 
-overallMean = numpy.sum(meanReplica)/len(meanReplica)
-
-####parameters of the distributions are calculated from each replica#####
-### we must get 128 distributions####
-# do we have to also exclude the ones with variance 0?#
-
-# for the first trial 
-# mean mu 
-# variance sigma 
-# generate a Poisson distribution 
+#################################### STATS FUNCTIONS ####################################
 
 # Input: a 2D array of trials, where each separate trial is a row
 # Output: a 2D array of the expected values for each trial and bin, 
@@ -128,6 +85,7 @@ def findGaussian(trials):
     for j in range(len(trials)):
         for i in range(len(trials[j])):
             gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j]))))
+
     return gaussian 
   
   
@@ -135,8 +93,6 @@ def findGaussian(trials):
 #        expected, a 2D array of expected values based on a PDF or PMF
 #        variance, a 1D array of the variance in each bin calculated globally 
 # Output: a 1D array of the chi-square values for each row (trial).
-
-
 def chiSquare(observed,expected,variance):
     chisq = numpy.empty(len(observed))
     
@@ -147,19 +103,7 @@ def chiSquare(observed,expected,variance):
         chisq[i] = chisqTot
     
     return chisq
-    
-"""
-def chiSquare(observed,expected,variance):
-    chisq = numpy.empty(len(observed))
-    
-    for i in range(len(observed)): 
-        chisqTot = 0 
-        for j in range(len(observed[i])):
-            chisqTot+=(observed[i][j]-expected[i][j])**2/expected[i][j]
-        chisq[i] = chisqTot
-    
-    return chisq                
-"""
+
 
 # Input: data, a 2D array of observed data 
 # Output: a 2D array of observed data, with half the number of trials 
@@ -183,6 +127,50 @@ def gt(expChiSq,calcChiSq):
             numGreater+=1
             
     return 100*numpy.divide(float(numGreater),float(len(calcChiSq)))
+ 
+
+#################################### SAMPLE DATA ####################################
+
+# Load sample data 
+s = sample
+# Row calculations
+sampleMean = [mean(s[i]) for i in range(len(s))]
+sampleVar = [variance(s[i],sampleMean[i]) for i in range(len(s))]
+# Transpose for ease of use in column calculations
+sTranspose = numpy.transpose(s)
+# Column calculations 
+sampleColMean = cMean(sTranspose)
+sampleColVar = cVar(sTranspose,sampleColMean)
+
+
+
+#################################### EXPERIMENTAL DATA ####################################
+
+# Load data from run of choice
+gData = run7
+
+# Row calculations 
+meanReplica = [mean(gData[i]) for i in range(len(gData))]
+replicaVarData = [variance(gData[i],meanReplica[i]) for i in range(len(gData))]
+replicaStdErr = [stdErr(gData[i],replicaVarData[i]) for i in range(len(gData))]
+
+# Transpose for ease of use in column calculations 
+geigerDataTransposed = numpy.transpose(gData)
+
+# Column calculations
+colMean = cMean(geigerDataTransposed)
+colVar = cVar(geigerDataTransposed,colMean)
+colStdErr = cStdErr(geigerDataTransposed,colVar)
+
+
+
+#################################### STATS ANALYSIS ####################################
+
+replicaPoissonDist = numpy.empty(len(gData))
+replicaGaussianDist = numpy.empty(len(gData))
+
+# overall mean of all collected data 
+overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
 # Compressed data sets 
 gData_64 = compress(gData)
