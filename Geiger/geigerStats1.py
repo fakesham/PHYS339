@@ -113,9 +113,9 @@ def compress(data):
     # just compress every two rows
     topHalf = numpy.empty((len(data)/2,len(data[0])))
     bottomHalf = numpy.empty((len(data)/2,len(data[0])))
-    for i in range(len(data)/2):
+    for i in range(int((len(data)/2))):
         topHalf[i]=data[i]
-    for i in range(0,len(data)/2):
+    for i in range(int(len(data)/2)):
         bottomHalf[i]=data[i+len(data)/2]
     return numpy.add(topHalf,bottomHalf) 
 
@@ -130,7 +130,7 @@ def gt(expChiSq,calcChiSq):
             
     return 100*numpy.divide(float(numGreater),float(len(calcChiSq)))
  
-
+"""
 #################################### SAMPLE DATA ####################################
 
 # Load sample data 
@@ -143,7 +143,7 @@ sTranspose = numpy.transpose(s)
 # Column calculations 
 sampleColMean = cMean(sTranspose)
 sampleColVar = cVar(sTranspose,sampleColMean)
-
+"""
 
 
 #################################### EXPERIMENTAL DATA ####################################
@@ -188,27 +188,27 @@ reps = int(numpy.log2(numRuns))+1
 # Compressed data sets 
 for i in range(reps-1):
     if(i==0):
-        exec("gData_%s = compress(gData)"%numRuns/2**(i+1))
+        exec("gData_%s = compress(gData)"%int(numRuns/2**(i+1)))
     else: 
-        exec("gData_%s = compress(gData_%s)"%(numRuns/2**(i+1),numRuns/2**(i))
+        exec("gData_%s = compress(gData_%s)"%(int(numRuns/2**(i+1)),int(numRuns/2**(i))))
 
 # All distributions and chi-squared values for each compressed data set 
 
 for i in range(reps):
-    index = numRuns/2**i
+    index = int(numRuns/2**i)
     if(i==0):
         exec("cv = colVar")
         exec("poisson%s = findPoisson(gData)"%index)
-        exec("csp%s = chiSquare(gData,poisson%s,cv"%(index, index))
+        exec("csp%s = chiSquare(gData,poisson%s,cv)"%(index, index))
         exec("gaussian%s = findGaussian(gData)"%index)
-        exec("csg%s = chiSquare(gData,gaussian%s,cv"%(index,index))
+        exec("csg%s = chiSquare(gData,gaussian%s,cv)"%(index,index))
 
     else: 
-        exec("cv = cVar(gData_%s, colMean)"%index)
-        exec("poisson%s = findPoisson(gData_%s)"%(index, index)
-        exec("csp%s = chiSquare(gData_%s,poisson%s,cv"%(index, index, index))
+        exec("cv = cVar(numpy.transpose(gData_%s), colMean)"%index)
+        exec("poisson%s = findPoisson(gData_%s)"%(index, index))
+        exec("csp%s = chiSquare(gData_%s,poisson%s,cv)"%(index, index, index))
         exec("gaussian%s = findGaussian(gData_%s)"%(index, index))
-        exec("csg%s = chiSquare(gData_%s,gaussian%s,cv"%(index, index, index))
+        exec("csg%s = chiSquare(gData_%s,gaussian%s,cv)"%(index, index, index))
 
 
 # expected chi-square 
@@ -226,26 +226,26 @@ for i in range(reps):
 #################################### PRINT STATEMENTS ####################################
 
 # Poisson 
-print("Poisson distribution for %d degrees of freedom:"%totalDOF-1)
-print("12.5% of values must be greater than %f\n"%(poissonChiSq))
+print("Poisson distribution for %d degrees of freedom:"%(totalDOF-1))
+print("12.5%% of values must be greater than %f\n"%(poissonChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
     ints = int(numIntervals*2**i)
     varName = "p"+str(n)
-    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f\n')"%(n,ints,varName,poissonChiSq))
+    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),poissonChiSq))
 
 print('\n\n')
 
 # Gaussian
-print("Gaussian distribution for %d degrees of freedom:"%totalDOF-2)
-print("12.5% of values must be greater than %f\n"%(gaussianChiSq))
+print("Gaussian distribution for %d degrees of freedom:"%(totalDOF-2))
+print("12.5%% of values must be greater than %f\n"%(gaussianChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
     ints = int(numIntervals*2**i)
     varName = "g"+str(n)
-    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f\n')"%(n,ints,varName,poissonChiSq))
+    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),poissonChiSq))
 
 
 
