@@ -157,6 +157,10 @@ gDataTransposed = numpy.transpose(gData)
 numIntervals = numpy.sum(gData[0])
 numRuns = len(gData)
 numBins = len(gDataTransposed)
+totalDOF = 0
+for i in range(len(gDataTransposed)):
+    if(numpy.sum(gDataTransposed[i])!=0):
+        totalDOF++
 
 # Row calculations 
 meanReplica = [mean(gData[i]) for i in range(len(gData))]
@@ -208,8 +212,8 @@ for i in range(reps):
 
 
 # expected chi-square 
-poissonChiSq = scipy.stats.chi2.isf(0.125,numBins-1)
-gaussianChiSq = scipy.stats.chi2.isf(0.125,numBins-2)
+poissonChiSq = scipy.stats.chi2.isf(0.125,totalDOF-1)
+gaussianChiSq = scipy.stats.chi2.isf(0.125,totalDOF-2)
 
 
 # greater-than values for all Poisson and Gaussian 
@@ -222,7 +226,7 @@ for i in range(reps):
 #################################### PRINT STATEMENTS ####################################
 
 # Poisson 
-print("Poisson distribution for %d degrees of freedom:"%len(gDataTransposed)-1)
+print("Poisson distribution for %d degrees of freedom:"%totalDOF-1)
 print("12.5% of values must be greater than %f\n"%(poissonChiSq))
 
 for i in range(reps):
@@ -231,9 +235,10 @@ for i in range(reps):
     varName = "p"+str(n)
     exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f\n')"%(n,ints,varName,poissonChiSq))
 
+print('\n\n')
 
 # Gaussian
-print("Gaussian distribution for %d degrees of freedom:"%len(gDataTransposed)-2)
+print("Gaussian distribution for %d degrees of freedom:"%totalDOF-2)
 print("12.5% of values must be greater than %f\n"%(gaussianChiSq))
 
 for i in range(reps):
