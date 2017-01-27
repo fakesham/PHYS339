@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import scipy.stats
 #%matplotlib inline
 
-# 2D array 
+# 2D array git add 
 # 128 rows 
 # 22 columns 
 
@@ -86,7 +86,7 @@ def findGaussian(trials):
 
     for j in range(len(trials)):
         for i in range(len(trials[j])):
-            gaussian[j][i] = numpy.sum(trials[j])*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j]))))
+            gaussian[j][i] = numpy.sum(trials[j])/(scipy.stats.norm.sf(0,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j])))))*scipy.stats.norm.pdf(i,mean(trials[j]),numpy.sqrt(variance(trials[j],mean(trials[j]))))
 
     return gaussian 
   
@@ -101,6 +101,8 @@ def chiSquare(observed,expected,variance):
     for i in range(len(observed)): 
         chisqTot = 0 
         for j in range(len(observed[i])):
+            if(variance[j]==0):
+                continue
             chisqTot+=(observed[i][j]-expected[i][j])**2/variance[j]
         chisq[i] = chisqTot
     
@@ -113,7 +115,7 @@ def compress(data):
     # just compress every two rows
     topHalf = numpy.empty((len(data)/2,len(data[0])))
     bottomHalf = numpy.empty((len(data)/2,len(data[0])))
-    for i in range(int((len(data)/2))):
+    for i in range(int(len(data)/2)):
         topHalf[i]=data[i]
     for i in range(int(len(data)/2)):
         bottomHalf[i]=data[i+len(data)/2]
@@ -253,9 +255,48 @@ for i in range(reps):
 
 # bar graph of total bin counts 
 totalBinCounts = [sum(gDataTransposed[i]) for i in range(len(gDataTransposed))] 
-x = plt.hist(totalBinCounts,bins=numBins)
+xvals = numpy.arange(0,numBins)
 
+# Poisson vs. Gaussian 
+plt.figure(figsize=(8,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Total events per interval",fontsize=12)
+plt.ylabel("Frequency",fontsize=12)
+plt.bar(xvals,totalBinCounts,color='lightgrey')
+plt.plot(xvals,numpy.transpose(gaussian1),linewidth=2,label="Gaussian")
+plt.plot(xvals,numpy.transpose(poisson1),linewidth=2,label="Poisson")
+plt.legend(fontsize=8)
+#p.errorbar(t,a[:,0],a[:,1],fmt='none',errorevery=1,label="Signal a")
+plt.savefig('totalbincounts.png',dpi=150,pad_inches=10) 
 
+# Residuals - Poisson 
+residuals = numpy.transpose(numpy.subtract(poisson1,totalBinCounts))
+plt.figure(figsize=(8,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Total events per interval",fontsize=12)
+plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
+plt.plot(xvals, residuals,'o')
+plt.legend(fontsize=8)
+plt.savefig('Poissonresiduals.png',dpi=150)
+
+# Residuals - Gaussian 
+residuals = numpy.transpose(numpy.subtract(gaussian1,totalBinCounts))
+plt.figure(figsize=(8,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Total events per interval",fontsize=12)
+plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
+plt.plot(xvals, residuals,'o')
+plt.legend(fontsize=8)
+plt.savefig('Gaussianresiduals.png',dpi=150)
+
+# Variance vs. mean - Poisson
+plt.figure(figsize=(8,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Mean frequency of events observed",fontsize=12)
+plt.ylabel("Variance of each value of observed events within interval",fontsize=12)
+plt.plot(colMean, colVar,'o')
+plt.legend(fontsize=8)
+plt.savefig('Poissonvarmean.png',dpi=150)
 
 #################################### UNUSED CODE ####################################
 """
