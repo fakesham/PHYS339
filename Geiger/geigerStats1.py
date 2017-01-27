@@ -148,19 +148,23 @@ sampleColVar = cVar(sTranspose,sampleColMean)
 
 # Load data from run of choice
 gData = run7
+# Transpose for ease of use in column calculations 
+gDataTransposed = numpy.transpose(gData)
+
+# Data parameters
+numIntervals = numpy.sum(gData[0])
+numRuns = len(gData)
+numBins = len(gDataTransposed)
 
 # Row calculations 
 meanReplica = [mean(gData[i]) for i in range(len(gData))]
 replicaVarData = [variance(gData[i],meanReplica[i]) for i in range(len(gData))]
 replicaStdErr = [stdErr(gData[i],replicaVarData[i]) for i in range(len(gData))]
 
-# Transpose for ease of use in column calculations 
-geigerDataTransposed = numpy.transpose(gData)
-
 # Column calculations
-colMean = cMean(geigerDataTransposed)
-colVar = cVar(geigerDataTransposed,colMean)
-colStdErr = cStdErr(geigerDataTransposed,colVar)
+colMean = cMean(gDataTransposed)
+colVar = cVar(gDataTransposed,colMean)
+colStdErr = cStdErr(gDataTransposed,colVar)
 
 
 
@@ -172,7 +176,108 @@ replicaGaussianDist = numpy.empty(len(gData))
 # overall mean of all collected data 
 overallMean = numpy.sum(meanReplica)/len(meanReplica)
 
+# repetitions of each for loop below 
+reps = int(numpy.log2(numRuns))+1
+
 # Compressed data sets 
+for i in range(reps-1):
+    if(i==0):
+        exec("gData_%s = compress(gData)"%numRuns/2**(i+1))
+    else: 
+        exec("gData_%s = compress(gData_%s)"%(numRuns/2**(i+1),numRuns/2**(i))
+
+# All distributions and chi-squared values for each compressed data set 
+
+for i in range(reps):
+    index = numRuns/2**i
+    if(i==0):
+        exec("cv = colVar")
+        exec("poisson%s = findPoisson(gData)"%index)
+        exec("csp%s = chiSquare(gData,poisson%s,cv"%(index, index))
+        exec("gaussian%s = findGaussian(gData)"%index)
+        exec("csg%s = chiSquare(gData,gaussian%s,cv"%(index,index))
+
+    else: 
+        exec("cv = cVar(gData_%s, colMean)"%index)
+        exec("poisson%s = findPoisson(gData_%s)"%(index, index)
+        exec("csp%s = chiSquare(gData_%s,poisson%s,cv"%(index, index, index))
+        exec("gaussian%s = findGaussian(gData_%s)"%(index, index))
+        exec("csg%s = chiSquare(gData_%s,gaussian%s,cv"%(index, index, index))
+
+
+# expected chi-square 
+poissonChiSq = scipy.stats.chi2.isf(0.125,numBins-1)
+gaussianChiSq = scipy.stats.chi2.isf(0.125,numBins-2)
+
+
+# greater-than values for all Poisson and Gaussian 
+for i in range(reps):
+    exec("p%s = gt(poissonChiSq,csp%s)"%(int(numRuns/2**i),int(numRuns/2**i)))
+    exec("g%s = gt(gaussianChiSq,csg%s)"%(int(numRuns/2**i),int(numRuns/2**i)))
+
+
+
+#################################### PRINT STATEMENTS ####################################
+
+# Poisson 
+print("Poisson distribution for %d degrees of freedom:")
+print("12.5% of values must be greater than %f\n"%(len(gDataTransposed)-1,poissonChiSq))
+
+for i in range(reps):
+    n = int(numRuns/2**i)
+    ints = int(numIntervals*2**i)
+    varName = "p"+str(n)
+    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f\n')"%(n,ints,varName,poissonChiSq))
+
+
+# Gaussian
+print("Gaussian distribution for %d degrees of freedom:")
+print("12.5% of values must be greater than %f\n"%(len(gDataTransposed)-2,gaussianChiSq))
+
+for i in range(reps):
+    n = int(numRuns/2**i)
+    ints = int(numIntervals*2**i)
+    varName = "g"+str(n)
+    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f\n')"%(n,ints,varName,poissonChiSq))
+
+
+
+#################################### PLOTS ####################################
+
+# bar graph of total bin counts 
+totalBinCounts = [sum(gDataTransposed[i]) for i in range(len(gDataTransposed))] 
+x = plt.hist(totalBinCounts,bins=numBins)
+
+
+
+#################################### UNUSED CODE ####################################
+"""
+# g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
+# calculate for each bin (22 bins)
+# 128 x 22
+def chiSquare (data,var,pdf):
+	tot = 0
+	for i in range (len(data)):
+     # ignore if variance is zero 
+		if var(i) != 0:
+			tot = tot + float(((data(i)-pdf(i))**2)/var(i))
+         return tot
+# we get 128/2 lists of 22 chisquares
+# what is the error on each bin ? difficult!!!
+g-chiSquare = [chiSquare(compressed1, replicaVarData, replicaGaussianDist) for i in range(compressed1)] 
+p-chiSquare = [chiSquare(compressed2, replicaVarData, replicaPoissonDist) for i in range(compressed1)]
+
+"""
+"""
+observedBinCounts = numpy.empty(len(gDataTransposed))
+for i in range(len(gDataTransposed)):
+    observedBinCounts[i] = numpy.sum(gDataTransposed[i])
+
+ # twice the number of intervals per replica.
+
+    
+compressed1 = compress(gData)  
+
 gData_64 = compress(gData)
 gData_32 = compress(gData_64)
 gData_16 = compress(gData_32)
@@ -181,81 +286,97 @@ gData_4 = compress(gData_8)
 gData_2 = compress(gData_4)
 gData_1 = compress(gData_2)
 
-# All distributions and chi-squared values for each compressed data set 
 
-cv = colVar
 
 # 128 trials
+cv = colVar
+
 poisson128 = findPoisson(gData)
 csp128 = chiSquare(gData,poisson128,cv) 
 gaussian128 = findGaussian(gData)
 csg128 = chiSquare(gData,gaussian128,cv)
 
-cv = cVar(gData_64, colMean)
 
 # 64 trials 
+cv = cVar(gData_64, colMean)
+
 poisson64 = findPoisson(gData_64)
 csp64 = chiSquare(gData_64,poisson64,cv) 
 gaussian64 = findGaussian(gData_64)
 csg64 = chiSquare(gData_64,gaussian64,cv)
 
-cv = cVar(gData_32, colMean)
 
 # 32 trials 
+cv = cVar(gData_32, colMean)
+
 poisson32 = findPoisson(gData_32)
 csp32 = chiSquare(gData_32,poisson32,cv) 
 gaussian32 = findGaussian(gData_32)
 csg32 = chiSquare(gData_32,gaussian32,cv)
 
-cv = cVar(gData_16, colMean)
 
 # 16 trials 
+cv = cVar(gData_16, colMean)
+
 poisson16 = findPoisson(gData_16)
 csp16 = chiSquare(gData_16,poisson16,cv) 
 gaussian16 = findGaussian(gData_16)
 csg16 = chiSquare(gData_16,gaussian16,cv)
 
-cv = cVar(gData_8, colMean)
 
 # 8 trials 
+cv = cVar(gData_8, colMean)
+
 poisson8 = findPoisson(gData_8)
 csp8 = chiSquare(gData_8,poisson8,cv) 
 gaussian8 = findGaussian(gData_8)
 csg8 = chiSquare(gData_8,gaussian8,cv)
 
-cVar(gData_4, colMean)
 
 # 4 trials 
+cv = cVar(gData_4, colMean)
+
 poisson4 = findPoisson(gData_4)
 csp4 = chiSquare(gData_4,poisson4,cv) 
 gaussian4 = findGaussian(gData_4)
 csg4 = chiSquare(gData_4,gaussian4,cv) 
 
-cVar(gData_2, colMean)
 
 # 2 trials 
+cv = cVar(gData_2, colMean)
+
 poisson2 = findPoisson(gData_2)
 csp2 = chiSquare(gData_2,poisson2,cv) 
 gaussian2 = findGaussian(gData_2)
 csg2 = chiSquare(gData_2,gaussian2,cv)
 
-cVar(gData_1, colMean)
 
 # 1 trial
+cv = cVar(gData_1, colMean)
+
 poisson1 = findPoisson(gData_1)
 csp1 = chiSquare(gData_1,poisson1,cv) 
 gaussian1 = findGaussian(gData_1)
 csg1 = chiSquare(gData_1,gaussian1,cv)
 
 
-# expected chi-square 
-poissonChiSq = scipy.stats.chi2.isf(0.125,21)
-gaussianChiSq = scipy.stats.chi2.isf(0.125,20)
+
+# we must see that the result is noisy must either increase the number of intervals more than 64 or add replicas together
+#we just repeat the collapse of the data set again compressed2 = compress(compressed1) 
+# we do it consecutively and compare distributions 
+# finally we take chisquare by meanCol,colVar if u want to get only one overall chi square for each bin so a list of 22 elements 
+#g-chiSquare = [chiSquare(meanCol, varCol, replicaGaussianDist) for i in range(meanCol)] 
+#p-chiSquare = [chiSquare(meanCol, varCol, replicaPoissonDist) for i in range(meanCol)]
+# the variance is not it !
+
+                
+xvals = numpy.linspace(0,21,num=22)
+plt.plot(xvals,replicaPoissonDist,'+')
+plt.plot(xvals,observedBinCounts,'o')
+#calculated values
+#plt.plot(xvals,replicaGaussianDist,'o')
 
 
-for i in range(numpy.log2(len(gData))):
-
-# gt -> greater than 
 p128 = gt(poissonChiSq,csp128)
 p64 = gt(poissonChiSq,csp64) 
 p32 = gt(poissonChiSq,csp32) 
@@ -266,7 +387,7 @@ p2 = gt(poissonChiSq,csp2)
 p1 = gt(poissonChiSq,csp1)
 
 
-print("Poisson distribution for 21 degrees of freedom: \n12.5 percent of values must be greater than %f\n"%(poissonChiSq))
+print("Poisson distribution for 21 degrees of freedom: \n12.5% of values must be greater than %f\n"%(poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(128,64, p128, poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(64,128, p64, poissonChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(32,256, p32, poissonChiSq))
@@ -298,52 +419,4 @@ print("%d replicas with %d intervals each: %f percent of values greater than %f"
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(2,4096, g2, gaussianChiSq))
 print("%d replicas with %d intervals each: %f percent of values greater than %f"%(1,8192, g1, gaussianChiSq))
 
-### PLOTS ### 
-totalBinCounts = [sum(geigerDataTransposed[i]) for i in range(len(geigerDataTransposed))] 
-x = plt.hist(totalBinCounts,bins=22)
-
-"""
-# g-chisquare and p-chisquare: difference between actual bin result and predicted Gaussian/Poisson bin result 
-# calculate for each bin (22 bins)
-# 128 x 22
-def chiSquare (data,var,pdf):
-	tot = 0
-	for i in range (len(data)):
-     # ignore if variance is zero 
-		if var(i) != 0:
-			tot = tot + float(((data(i)-pdf(i))**2)/var(i))
-         return tot
-# we get 128/2 lists of 22 chisquares
-# what is the error on each bin ? difficult!!!
-g-chiSquare = [chiSquare(compressed1, replicaVarData, replicaGaussianDist) for i in range(compressed1)] 
-p-chiSquare = [chiSquare(compressed2, replicaVarData, replicaPoissonDist) for i in range(compressed1)]
-
-"""
-"""
-observedBinCounts = numpy.empty(len(geigerDataTransposed))
-for i in range(len(geigerDataTransposed)):
-    observedBinCounts[i] = numpy.sum(geigerDataTransposed[i])
-
- # twice the number of intervals per replica.
-
-    
-compressed1 = compress(gData)  
-
-
-
-
-# we must see that the result is noisy must either increase the number of intervals more than 64 or add replicas together
-#we just repeat the collapse of the data set again compressed2 = compress(compressed1) 
-# we do it consecutively and compare distributions 
-# finally we take chisquare by meanCol,colVar if u want to get only one overall chi square for each bin so a list of 22 elements 
-#g-chiSquare = [chiSquare(meanCol, varCol, replicaGaussianDist) for i in range(meanCol)] 
-#p-chiSquare = [chiSquare(meanCol, varCol, replicaPoissonDist) for i in range(meanCol)]
-# the variance is not it !
-
-                
-xvals = numpy.linspace(0,21,num=22)
-plt.plot(xvals,replicaPoissonDist,'+')
-plt.plot(xvals,observedBinCounts,'o')
-#calculated values
-#plt.plot(xvals,replicaGaussianDist,'o')
 """
