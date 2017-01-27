@@ -1,0 +1,25 @@
+Poisson distribution for 32 degrees of freedom: 
+12.5% of values must be greater than 41.327794
+
+128 replicas with 64 intervals each: 16.406250 %  of values greater than 41.327794
+64 replicas with 128 intervals each: 4.687500 %  of values greater than 41.327794
+32 replicas with 256 intervals each: 0.000000 %  of values greater than 41.327794
+16 replicas with 512 intervals each: 0.000000 %  of values greater than 41.327794
+8 replicas with 1024 intervals each: 0.000000 %  of values greater than 41.327794
+4 replicas with 2048 intervals each: 0.000000 %  of values greater than 41.327794
+2 replicas with 4096 intervals each: 0.000000 %  of values greater than 41.327794
+1 replicas with 8192 intervals each: 0.000000 %  of values greater than 41.327794
+
+
+
+Gaussian distribution for 31 degrees of freedom: 
+12.5% of values must be greater than 40.181412
+
+128 replicas with 64 intervals each: 17.187500 %  of values greater than 40.181412
+64 replicas with 128 intervals each: 4.687500 %  of values greater than 40.181412
+32 replicas with 256 intervals each: 0.000000 %  of values greater than 40.181412
+16 replicas with 512 intervals each: 0.000000 %  of values greater than 40.181412
+8 replicas with 1024 intervals each: 0.000000 %  of values greater than 40.181412
+4 replicas with 2048 intervals each: 0.000000 %  of values greater than 40.181412
+2 replicas with 4096 intervals each: 0.000000 %  of values greater than 40.181412
+1 replicas with 8192 intervals each: 0.000000 %  of values greater than 40.181412

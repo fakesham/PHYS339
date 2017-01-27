@@ -151,7 +151,7 @@ sampleColVar = cVar(sTranspose,sampleColMean)
 #################################### EXPERIMENTAL DATA ####################################
 
 # Load data from run of choice
-gData = run7
+gData = histogram
 # Transpose for ease of use in column calculations 
 gDataTransposed = numpy.transpose(gData)
 
@@ -227,29 +227,33 @@ for i in range(reps):
 
 #################################### PRINT STATEMENTS ####################################
 
+exec("savefile = open('distChiSq%s.txt','w+')"%int(overallMean))
+
 # Poisson 
-print("Poisson distribution for %d degrees of freedom:"%(totalDOF-1))
-print("12.5%% of values must be greater than %f\n"%(poissonChiSq))
+savefile.write("Poisson distribution for %d degrees of freedom: \n"%(totalDOF-1))
+savefile.write("12.5%% of values must be greater than %f\n\n"%(poissonChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
     ints = int(numIntervals*2**i)
     varName = "p"+str(n)
-    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),poissonChiSq))
+    exec("savefile.write('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),poissonChiSq))
+    savefile.write('\n')  
 
 print('\n\n')
+savefile.write("\n\n\n")
 
 # Gaussian
-print("Gaussian distribution for %d degrees of freedom:"%(totalDOF-2))
-print("12.5%% of values must be greater than %f\n"%(gaussianChiSq))
+savefile.write("Gaussian distribution for %d degrees of freedom: \n"%(totalDOF-2))
+savefile.write("12.5%% of values must be greater than %f\n\n"%(gaussianChiSq))
 
 for i in range(reps):
     n = int(numRuns/2**i)
     ints = int(numIntervals*2**i)
     varName = "g"+str(n)
-    exec("print('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),poissonChiSq))
-
-
+    exec("savefile.write('%d replicas with %d intervals each: %f %%  of values greater than %f')"%(n,ints,eval(varName),gaussianChiSq))
+    savefile.write('\n')
+savefile.close()
 
 #################################### PLOTS ####################################
 
@@ -267,7 +271,7 @@ plt.plot(xvals,numpy.transpose(gaussian1),linewidth=2,label="Gaussian")
 plt.plot(xvals,numpy.transpose(poisson1),linewidth=2,label="Poisson")
 plt.legend(fontsize=8)
 #p.errorbar(t,a[:,0],a[:,1],fmt='none',errorevery=1,label="Signal a")
-plt.savefig('totalbincounts.png',dpi=150,pad_inches=10) 
+exec("plt.savefig('totalbincounts_%s.png',dpi=150,pad_inches=10)"%int(overallMean))
 
 # Residuals - Poisson 
 residuals = numpy.transpose(numpy.subtract(poisson1,totalBinCounts))
@@ -277,7 +281,7 @@ plt.xlabel("Total events per interval",fontsize=12)
 plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
 plt.plot(xvals, residuals,'o')
 plt.legend(fontsize=8)
-plt.savefig('Poissonresiduals.png',dpi=150)
+exec("plt.savefig('Poissonresiduals_%s.png',dpi=150)"%int(overallMean))
 
 # Residuals - Gaussian 
 residuals = numpy.transpose(numpy.subtract(gaussian1,totalBinCounts))
@@ -287,7 +291,7 @@ plt.xlabel("Total events per interval",fontsize=12)
 plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
 plt.plot(xvals, residuals,'o')
 plt.legend(fontsize=8)
-plt.savefig('Gaussianresiduals.png',dpi=150)
+exec("plt.savefig('Gaussianresiduals__%s.png',dpi=150)"%int(overallMean))
 
 # Variance vs. mean - Poisson
 plt.figure(figsize=(8,6), dpi=150)
@@ -296,7 +300,9 @@ plt.xlabel("Mean frequency of events observed",fontsize=12)
 plt.ylabel("Variance of each value of observed events within interval",fontsize=12)
 plt.plot(colMean, colVar,'o')
 plt.legend(fontsize=8)
-plt.savefig('Poissonvarmean.png',dpi=150)
+exec("plt.savefig('Poissonvarmean_%s.png',dpi=150)"%int(overallMean))
+
+
 
 #################################### UNUSED CODE ####################################
 """
