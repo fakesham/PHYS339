@@ -155,7 +155,7 @@ sampleColVar = cVar(sTranspose,sampleColMean)
 #################################### EXPERIMENTAL DATA ####################################
 
 # Load data from run of choice
-gData = run7
+gData = histogram
 # Transpose for ease of use in column calculations 
 gDataTransposed = numpy.transpose(gData)
 
@@ -284,7 +284,7 @@ plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 plt.xlabel("Total events per interval",fontsize=12)
 plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
 plt.errorbar(xvals, residuals, yerr=ye, fmt='o')
-plt.plot([0,25],[0,0])
+plt.plot([0,35],[0,0])
 plt.legend(fontsize=8)
 exec("plt.savefig('Poissonresiduals_%s.png',dpi=150)"%int(overallMean))
 
@@ -297,7 +297,7 @@ plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 plt.xlabel("Total events per interval",fontsize=12)
 plt.ylabel("Residual value \n(predicted frequency - observed frequency)",fontsize=12)
 plt.errorbar(xvals, residuals, yerr=ye, fmt='o')
-plt.plot([0,25],[0,0])
+plt.plot([0,35],[0,0])
 plt.legend(fontsize=8)
 exec("plt.savefig('Gaussianresiduals__%s.png',dpi=150)"%int(overallMean))
 
