@@ -155,7 +155,7 @@ sampleColVar = cVar(sTranspose,sampleColMean)
 #################################### EXPERIMENTAL DATA ####################################
 
 # Load data from run of choice
-gData = histogram
+gData = run7
 # Transpose for ease of use in column calculations 
 gDataTransposed = numpy.transpose(gData)
 
@@ -316,10 +316,12 @@ exec("plt.savefig('Poissonvarmean_%s.png',dpi=150)"%int(overallMean))
 plt.figure(figsize=(8,6), dpi=150)
 plt.hist(csp1024,bins=1024,color='lightgrey')
 df = totalDOF-1
-x = numpy.linspace(0,max(csp1024),num=512)
+x = numpy.linspace(0,max(csp128),num=512)
 y = numpy.multiply(chi2.pdf(x,df),1024)
 plt.xlabel("Chi-square value",fontsize=12)
 plt.ylabel("Frequency",fontsize=12)
+axes = plt.gca()
+axes.set_xlim([0,350])
 plt.plot(x,y,color='red',label="Chi-square distribution for %d degrees of freedom"%df)
 plt.legend(fontsize=8)
 plt.savefig('chisq_1024.png')
