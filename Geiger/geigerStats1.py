@@ -105,7 +105,7 @@ def chiSquare(observed,expected,variance):
     for i in range(len(observed)): 
         chisqTot = 0 
         for j in range(len(observed[i])):
-            if(variance[j]==0):
+            if(variance[j]<0.0001):
                 continue
             chisqTot+=(observed[i][j]-expected[i][j])**2/variance[j]
         chisq[i] = chisqTot
@@ -155,7 +155,7 @@ sampleColVar = cVar(sTranspose,sampleColMean)
 #################################### EXPERIMENTAL DATA ####################################
 
 # Load data from run of choice
-gData = histogram
+gData = run7
 # Transpose for ease of use in column calculations 
 gDataTransposed = numpy.transpose(gData)
 
@@ -315,6 +315,17 @@ plt.xlabel("Chi-square value",fontsize=12)
 plt.ylabel("Frequency",fontsize=12)
 plt.plot(x,y,color='red')
 plt.savefig('chisq_1024.png')
+
+# Chi square - Poisson 
+plt.figure(figsize=(8,6), dpi=150)
+plt.hist(csp128,bins=128,color='lightgrey')
+df = totalDOF-1
+x = numpy.linspace(0,max(csp128),num=128)
+y = numpy.multiply(chi2.pdf(x,df),128)
+plt.xlabel("Chi-square value",fontsize=12)
+plt.ylabel("Frequency",fontsize=12)
+plt.plot(x,y,color='red')
+plt.savefig('chisq_128.png')
 
 #################################### UNUSED CODE ####################################
 """
