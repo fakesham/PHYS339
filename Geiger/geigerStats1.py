@@ -308,7 +308,9 @@ plt.hist(csp1024,bins=512,color='lightgrey')
 df = totalDOF-1
 x = numpy.linspace(0,max(csp1024),num=512)
 y = numpy.multiply(chi2.pdf(x,df),1024)
-plt.plot(x,y)
+plt.xlabel("Chi-square value",fontsize=12)
+plt.ylabel("Frequency",fontsize=12)
+plt.plot(x,y,color='red')
 plt.savefig('chisq_1024.png')
 
 #################################### UNUSED CODE ####################################
