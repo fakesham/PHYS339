@@ -1,6 +1,7 @@
 import numpy 
 import matplotlib.pyplot as plt 
 import scipy.stats
+from scipy.stats import chi2
 #%matplotlib inline
 
 # 2D array git add 
@@ -266,11 +267,10 @@ plt.figure(figsize=(8,6), dpi=150)
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 plt.xlabel("Total events per interval",fontsize=12)
 plt.ylabel("Frequency",fontsize=12)
-plt.bar(xvals,totalBinCounts,color='lightgrey')
+plt.bar(xvals,totalBinCounts,color='lightgrey',yerr=numpy.transpose(colStdErr))
 plt.plot(xvals,numpy.transpose(gaussian1),linewidth=2,label="Gaussian")
 plt.plot(xvals,numpy.transpose(poisson1),linewidth=2,label="Poisson")
 plt.legend(fontsize=8)
-#p.errorbar(t,a[:,0],a[:,1],fmt='none',errorevery=1,label="Signal a")
 exec("plt.savefig('totalbincounts_%s.png',dpi=150,pad_inches=10)"%int(overallMean))
 
 # Residuals - Poisson 
@@ -302,7 +302,14 @@ plt.plot(colMean, colVar,'o')
 plt.legend(fontsize=8)
 exec("plt.savefig('Poissonvarmean_%s.png',dpi=150)"%int(overallMean))
 
-
+# Chi square - Poisson 
+plt.figure(figsize=(8,6), dpi=150)
+plt.hist(csp1024,bins=512,color='lightgrey')
+df = totalDOF-1
+x = numpy.linspace(0,max(csp1024),num=512)
+y = numpy.multiply(chi2.pdf(x,df),1024)
+plt.plot(x,y)
+plt.savefig('chisq_1024.png')
 
 #################################### UNUSED CODE ####################################
 """
@@ -321,8 +328,7 @@ def chiSquare (data,var,pdf):
 g-chiSquare = [chiSquare(compressed1, replicaVarData, replicaGaussianDist) for i in range(compressed1)] 
 p-chiSquare = [chiSquare(compressed2, replicaVarData, replicaPoissonDist) for i in range(compressed1)]
 
-"""
-"""
+
 observedBinCounts = numpy.empty(len(gDataTransposed))
 for i in range(len(gDataTransposed)):
     observedBinCounts[i] = numpy.sum(gDataTransposed[i])
