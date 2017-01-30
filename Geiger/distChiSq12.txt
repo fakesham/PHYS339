@@ -2,15 +2,15 @@ Poisson distribution for 29 degrees of freedom:
 12.5% of values must be greater than 37.881236
 
 1024 replicas with 64 intervals each: 10.839844 %  of values greater than 37.881236
-512 replicas with 128 intervals each: 8.203125 %  of values greater than 37.881236
-256 replicas with 256 intervals each: 5.468750 %  of values greater than 37.881236
-128 replicas with 512 intervals each: 2.343750 %  of values greater than 37.881236
-64 replicas with 1024 intervals each: 3.125000 %  of values greater than 37.881236
-32 replicas with 2048 intervals each: 0.000000 %  of values greater than 37.881236
-16 replicas with 4096 intervals each: 0.000000 %  of values greater than 37.881236
-8 replicas with 8192 intervals each: 0.000000 %  of values greater than 37.881236
-4 replicas with 16384 intervals each: 0.000000 %  of values greater than 37.881236
-2 replicas with 32768 intervals each: 0.000000 %  of values greater than 37.881236
+512 replicas with 128 intervals each: 12.304688 %  of values greater than 37.881236
+256 replicas with 256 intervals each: 15.625000 %  of values greater than 37.881236
+128 replicas with 512 intervals each: 16.406250 %  of values greater than 37.881236
+64 replicas with 1024 intervals each: 15.625000 %  of values greater than 37.881236
+32 replicas with 2048 intervals each: 12.500000 %  of values greater than 37.881236
+16 replicas with 4096 intervals each: 12.500000 %  of values greater than 37.881236
+8 replicas with 8192 intervals each: 87.500000 %  of values greater than 37.881236
+4 replicas with 16384 intervals each: 100.000000 %  of values greater than 37.881236
+2 replicas with 32768 intervals each: 100.000000 %  of values greater than 37.881236
 1 replicas with 65536 intervals each: 0.000000 %  of values greater than 37.881236
 
 
@@ -19,13 +19,13 @@ Gaussian distribution for 28 degrees of freedom:
 12.5% of values must be greater than 36.727182
 
 1024 replicas with 64 intervals each: 15.820312 %  of values greater than 36.727182
-512 replicas with 128 intervals each: 10.351562 %  of values greater than 36.727182
-256 replicas with 256 intervals each: 10.937500 %  of values greater than 36.727182
-128 replicas with 512 intervals each: 8.593750 %  of values greater than 36.727182
-64 replicas with 1024 intervals each: 18.750000 %  of values greater than 36.727182
-32 replicas with 2048 intervals each: 62.500000 %  of values greater than 36.727182
-16 replicas with 4096 intervals each: 93.750000 %  of values greater than 36.727182
+512 replicas with 128 intervals each: 20.703125 %  of values greater than 36.727182
+256 replicas with 256 intervals each: 31.640625 %  of values greater than 36.727182
+128 replicas with 512 intervals each: 59.375000 %  of values greater than 36.727182
+64 replicas with 1024 intervals each: 92.187500 %  of values greater than 36.727182
+32 replicas with 2048 intervals each: 100.000000 %  of values greater than 36.727182
+16 replicas with 4096 intervals each: 100.000000 %  of values greater than 36.727182
 8 replicas with 8192 intervals each: 100.000000 %  of values greater than 36.727182
 4 replicas with 16384 intervals each: 100.000000 %  of values greater than 36.727182
 2 replicas with 32768 intervals each: 100.000000 %  of values greater than 36.727182
-1 replicas with 65536 intervals each: 100.000000 %  of values greater than 36.727182
+1 replicas with 65536 intervals each: 0.000000 %  of values greater than 36.727182

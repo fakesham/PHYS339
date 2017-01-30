@@ -62,7 +62,10 @@ def cVar(trials,means):
 #        variances, a 1D array of the variances of each row in trials
 # Output: a 1D array containing the standard error of each row in trials.   
 def cStdErr(trials,variances):
-    return [numpy.sqrt(numpy.divide(variances[i],len(trials[i]))) for i in range(len(trials))]
+    toReturn = numpy.empty(len(trials))
+    for i in range(len(trials)):
+        toReturn[i] = numpy.sqrt(numpy.divide(variances[i],sum(trials[i])))
+    return toReturn
 
 
 
@@ -207,11 +210,11 @@ for i in range(reps):
         exec("csg%s = chiSquare(gData,gaussian%s,cv)"%(index,index))
 
     else: 
-        exec("cv = cVar(numpy.transpose(gData_%s), colMean)"%index)
+        exec("cv%s = cVar(numpy.transpose(gData_%s), cMean(numpy.transpose(gData_%s)))"%(index, index, index))
         exec("poisson%s = findPoisson(gData_%s)"%(index, index))
-        exec("csp%s = chiSquare(gData_%s,poisson%s,cv)"%(index, index, index))
+        exec("csp%s = chiSquare(gData_%s,poisson%s,cv%s)"%(index, index, index, index))
         exec("gaussian%s = findGaussian(gData_%s)"%(index, index))
-        exec("csg%s = chiSquare(gData_%s,gaussian%s,cv)"%(index, index, index))
+        exec("csg%s = chiSquare(gData_%s,gaussian%s,cv%s)"%(index, index, index, index))
 
 
 # expected chi-square 
@@ -304,7 +307,7 @@ exec("plt.savefig('Poissonvarmean_%s.png',dpi=150)"%int(overallMean))
 
 # Chi square - Poisson 
 plt.figure(figsize=(8,6), dpi=150)
-plt.hist(csp1024,bins=512,color='lightgrey')
+plt.hist(csp1024,bins=1024,color='lightgrey')
 df = totalDOF-1
 x = numpy.linspace(0,max(csp1024),num=512)
 y = numpy.multiply(chi2.pdf(x,df),1024)
