@@ -62,6 +62,7 @@ int get_value() { // called when there is serial input available
   } while (true);
 }
 
+
 void loop() {
   if (!Serial.available()) return; // no demands are the best demands
   int value = get_value(); // deal with customer
