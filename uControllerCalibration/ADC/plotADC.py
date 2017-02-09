@@ -23,6 +23,13 @@ A3plot = []
 A4plot = []
 A5plot = []
 
+dataXvals = []
+dataXvals.append900
+i=-1
+while(i<248):
+    i+=8
+    dataXvals.append(i)
+
 for i in range(len(A0data)): 
     if(A0data[i]!=0):
         A0plot.append(i)
@@ -47,13 +54,27 @@ for i in range(len(A5data)):
     if(A4data[i]!=0):
         A5plot.append(i)
 
-lineParams = numpy.loadtxt('linFitData.txt')
+lineParams = numpy.loadtxt('LinFitData.txt')
 
 m = lineParams[0]
 b = lineParams[1]
 
-xvals = numpy.arange(0, 256, 0.5)
-yvals = numpy.multiply(m,xvals)+b
+xvals = numpy.arange(7, 256, 0.5)
+yvals = numpy.multiply(m,xvals)
+yvals = numpy.add(yvals,b)
+yvals = numpy.multiply(yvals,1024/5)
 
-plt.plot(xvals,yvals)
-plt.plot()
+expected = numpy.multiply(m,dataXvals)
+expected = numpy.add(expected,b)
+expected = numpy.multiply(expected,1024/5)
+
+p= numpy.subtract(expected,A0plot)
+
+for i in range(5):
+    exec("res%d = numpy.transpose(numpy.subtract(expected,A%dplot))"%(i,i))
+    exec("plt.figure(figsize=(8,6), dpi=150)")
+    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
+    exec("plt.xlabel('Value sent to Arduino',fontsize=12)")
+    exec("plt.ylabel('Value received from Arduino',fontsize=12)")
+    exec("plt.plot(dataXvals, res%d, '+')"%i)
+    exec("plt.plot([0,35],[0,0])")

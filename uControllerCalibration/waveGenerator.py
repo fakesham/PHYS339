@@ -56,6 +56,7 @@ def fourierSawtooth(freq,amp,x,d):
         w = numpy.multiply(1/(n+1),s)
         w = w*scale((n+1)*freq)
         y = numpy.add(y,w)
+        if(n=10)
         
     y = numpy.multiply(y,amp)
     y = numpy.divide(y,numpy.pi)
