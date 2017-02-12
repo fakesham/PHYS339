@@ -7,7 +7,7 @@ Created on Tue Feb  7 18:32:42 2017
 import numpy
 import matplotlib.pyplot as plt  
 
-t = 0.5
+t = 1
 # length of time to generate data for (s) 
 intLen = 0.001
 # interval length between each data point (s) 
@@ -56,7 +56,6 @@ def fourierSawtooth(freq,amp,x,d):
         w = numpy.multiply(1/(n+1),s)
         w = w*scale((n+1)*freq)
         y = numpy.add(y,w)
-        if(n=10)
         
     y = numpy.multiply(y,amp)
     y = numpy.divide(y,numpy.pi)

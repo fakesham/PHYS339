@@ -23,12 +23,13 @@ A3plot = []
 A4plot = []
 A5plot = []
 
-dataXvals = []
-dataXvals.append900
-i=-1
-while(i<248):
-    i+=8
+dataXvals = [0]
+
+i=7
+while(i<256):
     dataXvals.append(i)
+    i+=8
+
 
 for i in range(len(A0data)): 
     if(A0data[i]!=0):
@@ -68,13 +69,14 @@ expected = numpy.multiply(m,dataXvals)
 expected = numpy.add(expected,b)
 expected = numpy.multiply(expected,1024/5)
 
-p= numpy.subtract(expected,A0plot)
 
-for i in range(5):
+
+for i in range(6):
     exec("res%d = numpy.transpose(numpy.subtract(expected,A%dplot))"%(i,i))
     exec("plt.figure(figsize=(8,6), dpi=150)")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.xlabel('Value sent to Arduino',fontsize=12)")
-    exec("plt.ylabel('Value received from Arduino',fontsize=12)")
+    plt.ylabel('Residual \n (expected return value - observed return value)',fontsize=12)
     exec("plt.plot(dataXvals, res%d, '+')"%i)
-    exec("plt.plot([0,35],[0,0])")
+    exec("plt.plot([0,max(dataXvals)],[0,0])")
+    exec("plt.savefig('residuals_A%d.png')"%i)
