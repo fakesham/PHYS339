@@ -55,20 +55,7 @@ for i in range(len(A5data)):
     if(A4data[i]!=0):
         A5plot.append(i)
 
-lineParams = numpy.loadtxt('LinFitData.txt')
-
-m = lineParams[0]
-b = lineParams[1]
-
-xvals = numpy.arange(7, 256, 0.5)
-yvals = numpy.multiply(m,xvals)
-yvals = numpy.add(yvals,b)
-yvals = numpy.multiply(yvals,1024/5)
-
-expected = numpy.multiply(m,dataXvals)
-expected = numpy.add(expected,b)
-expected = numpy.multiply(expected,1024/5)
-
+# Plot for raw data 
 plt.figure(figsize=(8,6), dpi=150)
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 plt.xlabel('Value sent to Arduino',fontsize=12)
@@ -80,14 +67,24 @@ legend = plt.legend(loc="upper left")
 
 plt.savefig('analogPins.png')
 
-"""
+# Storing linear fit data 
 for i in range(6):
-    exec("res%d = numpy.transpose(numpy.subtract(expected,A%dplot))"%(i,i))
-    exec("plt.figure(figsize=(8,6), dpi=150)")
-    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
-    exec("plt.xlabel('Value sent to Arduino',fontsize=12)")
-    plt.ylabel('Residual \n (expected return value - observed return value)',fontsize=12)
-    exec("plt.plot(dataXvals, res%d, '+')"%i)
-    exec("plt.plot([0,max(dataXvals)],[0,0])")
-    exec("plt.savefig('residuals_A%d.png')"%i)
-"""
+    exec("lineDataA%d = numpy.polyfit(dataXvals,A%dplot,1,cov=True)"%(i,i))
+    exec("params%d = lineDataA%d[0]"%(i,i))
+    exec("cov%d = lineDataA%d[1]"%(i,i))
+    exec("m%d = params%d[0]"%(i,i))
+    exec("b%d = params%d[1]"%(i,i))
+    exec("mErr%d = cov%d[0][0]"%(i,i))
+    exec("bErr%d = cov%d[1][1]"%(i,i))
+    exec("yErr%d = [numpy.sqrt(mErr%d*dataXvals[i]**2+bErr%d) for i in range(len(dataXvals))]"%(i,i,i))
+    
+tableCode = open("ADCdata.txt","w+")
+
+for i in range(6): 
+    exec("toWrite =('ADC%d & ' +str(m%d)+' & '+str(mErr%d)+' & '+str(b%d)+' & '+str(bErr%d)+' \\\ \hline ')"%(i,i,i,i,i))
+    toWrite+='\n'
+    tableCode.write(toWrite)
+    
+tableCode.close()
+
+
