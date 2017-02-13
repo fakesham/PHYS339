@@ -69,8 +69,18 @@ expected = numpy.multiply(m,dataXvals)
 expected = numpy.add(expected,b)
 expected = numpy.multiply(expected,1024/5)
 
+plt.figure(figsize=(8,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel('Value sent to Arduino',fontsize=12)
+plt.ylabel('Value received from Arduino',fontsize=12)
+for i in range(6):
+    exec("plt.plot(dataXvals, A%dplot, '+',label='Pin A%d')"%(i,i))
+plt.plot([0,max(dataXvals)],[0,0])
+legend = plt.legend(loc="upper left")
 
+plt.savefig('analogPins.png')
 
+"""
 for i in range(6):
     exec("res%d = numpy.transpose(numpy.subtract(expected,A%dplot))"%(i,i))
     exec("plt.figure(figsize=(8,6), dpi=150)")
@@ -80,3 +90,4 @@ for i in range(6):
     exec("plt.plot(dataXvals, res%d, '+')"%i)
     exec("plt.plot([0,max(dataXvals)],[0,0])")
     exec("plt.savefig('residuals_A%d.png')"%i)
+"""
