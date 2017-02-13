@@ -80,11 +80,27 @@ for i in range(6):
     
 tableCode = open("ADCdata.txt","w+")
 
+"""
 for i in range(6): 
     exec("toWrite =('ADC%d & ' +str(m%d)+' & '+str(mErr%d)+' & '+str(b%d)+' & '+str(bErr%d)+' \\\ \hline ')"%(i,i,i,i,i))
-    toWrite+='\n'
+    tableCode= tableCode+'\n'
     tableCode.write(toWrite)
-    
+"""    
 tableCode.close()
+
+
+predValuesA0 = [numpy.sum(numpy.multiply(m0,dataXvals[i]),b0) for i in range(len(dataXvals))]
+predValuesA0 = numpy.multiply(predValuesA0,1)
+residuals = numpy.subtract(predValuesA0,A0plot)
+plt.figure(figsize=(12,6), dpi=150)
+plt.xlabel("Value sent to Arduino",fontsize=12)
+plt.ylabel("Residual value (V) \n (value predicted - value observed)",fontsize=12)
+axes = plt.gca()
+axes.yaxis.labelpad = 0 
+axes.set_ylim([-10,10])
+axes.set_xlim([0,max(dataXvals)])
+plt.errorbar(dataXvals, residuals,yerr=yErr0,fmt='o')
+plt.plot([0,max(dataXvals)],[0,0])
+plt.savefig('A0res.png')
 
 

@@ -52,9 +52,9 @@ plt.xlabel("Value sent to Arduino",fontsize=12)
 plt.ylabel("Residual value (V) \n (voltage predicted - voltage observed)",fontsize=12)
 axes = plt.gca()
 axes.yaxis.labelpad = 0 
-axes.set_xlim([0,350])
+axes.set_xlim([0,max(xvals)])
 plt.errorbar(xvals, residuals,yerr=yErr,fmt='o')
 plt.plot([0,max(xvals)],[0,0])
-plt.savefig('linFitRes')
+plt.savefig('linFitRes.png')
 
 numpy.savetxt('linFitData.txt',params)
