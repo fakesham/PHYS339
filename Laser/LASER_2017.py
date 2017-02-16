@@ -62,7 +62,7 @@ class Arduino:
 a = Arduino()
 
 steps = 360
-a.send("LASER 0")
+a.send("LASER 2500")
 a.getResp()
 a.send("STEPS %d"%(steps))
 a.send("DELAYS 20")
@@ -95,18 +95,27 @@ while True:
     if -1 == index:
         break
 a.send("STOP")
-a.send("LASER 0")
+a.send("LASER 2500")
 
 adcVals = []
-for i in range(100):
-    a.send("LASER %d"%(i*40))
-    sleep(0.2)
-    a.getResp()
+for i in range(200):
+    wombat = False
+    a.send("LASER %d"%((2000)+i*10))
+    sleep(0.02)
     respLaser = string.split(a.getResp(),":")
-    if(respLaser[0]!=("Timeout!")):
+    """if(respLaser[0]!=("Timeout!")):
         adcVals.append(respLaser[1])
+    else:
+        respLaser = string.split(a.getResp(),":")
+    """
+    while (wombat == False):
+        respLaser = string.split(a.getResp(),":")
+        if(respLaser[0]!="Timeout!" and respLaser[0]!=""):
+            if(respLaser[1]!=""):
+                adcVals.append(respLaser[1])
+                wombat = True
     
 p.figure()
-x = numpy.linspace(0,4080,len(adcVals))
+x = numpy.linspace(2000,4000,len(adcVals))
 p.plot(x,adcVals)
-
+numpy.savetxt('intensitydata.txt')
