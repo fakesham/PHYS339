@@ -10,6 +10,8 @@ import serial
 import matplotlib.pyplot as p
 import numpy
 import string
+import os 
+from time import sleep 
 
 # This is pretty familiar
 
@@ -58,8 +60,10 @@ class Arduino:
 #
 
 a = Arduino()
-steps = 512
-a.send("LASER 4095")
+
+steps = 360
+a.send("LASER 0")
+a.getResp()
 a.send("STEPS %d"%(steps))
 a.send("DELAYS 20")
 a.send("START")
@@ -68,6 +72,7 @@ p.xlabel("Step index")
 p.ylabel("ADC reading")
 vector = numpy.zeros((2,steps))
 lines = [False,False]
+
 index = -1
 while True:
     resp = a.getResp()
@@ -80,13 +85,28 @@ while True:
                 for i in lines[index & 1]:
                     i.remove()
             lines[index & 1] = p.plot(range(steps),vector[index & 1,:])  
-            p.pause(0.01)              
+            p.pause(0.01)
+            exec("numpy.savetxt('laserSineWave%d.txt',vector)"%index)
             index += 1
         vector[index&1,step] = adc
     else:
         print("Unexpected response: %s"%(resp))
         print("Length: %d"%(len(resp)))
-    if 10 == index:
+    if -1 == index:
         break
 a.send("STOP")
 a.send("LASER 0")
+
+adcVals = []
+for i in range(100):
+    a.send("LASER %d"%(i*40))
+    sleep(0.2)
+    a.getResp()
+    respLaser = string.split(a.getResp(),":")
+    if(respLaser[0]!=("Timeout!")):
+        adcVals.append(respLaser[1])
+    
+p.figure()
+x = numpy.linspace(0,4080,len(adcVals))
+p.plot(x,adcVals)
+

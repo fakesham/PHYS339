@@ -41,13 +41,13 @@ void parse_input() {
     if ('\n' == buf[i]) {
       if (!strncmp("LASER",buf,5)) {
         parse_laser();
-        return;
+        //return;
       } else if (!strncmp("STEPS",buf,5)) {
         parse_steps();
         return;
       } else if (!strncmp("DELAYS",buf,6)) {
-        return;
         parse_delays();
+        return;
       } else if (!strncmp("START",buf,5)) {
         if (mode) return;
         mode = 1;
@@ -88,7 +88,7 @@ void parse_steps(void) {
 }
 
 void parse_delays(void){
-  if (1 != sscanf(buf+7,"%ud",&steps)) {
+  if (1 != sscanf(buf+7,"%ud",&delays)) {
     Serial.println("Syntax: DELAYS <number>");
   }
   return;
