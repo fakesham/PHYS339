@@ -62,7 +62,7 @@ class Arduino:
 a = Arduino()
 
 steps = 360
-a.send("LASER 2500")
+a.send("LASER 3300")
 a.getResp()
 a.send("STEPS %d"%(steps))
 a.send("DELAYS 20")
@@ -86,17 +86,18 @@ while True:
                     i.remove()
             lines[index & 1] = p.plot(range(steps),vector[index & 1,:])  
             p.pause(0.01)
-            exec("numpy.savetxt('laserSineWave%d.txt',vector)"%index)
+            exec("numpy.savetxt('brewsterAngle%d.txt',vector)"%index)
             index += 1
         vector[index&1,step] = adc
     else:
         print("Unexpected response: %s"%(resp))
         print("Length: %d"%(len(resp)))
-    if -1 == index:
+    if 20 == index:
         break
 a.send("STOP")
-a.send("LASER 2500")
 
+#a.send("LASER 2500")
+"""
 adcVals = []
 adcintVals = []
 for i in range(200):
@@ -104,11 +105,11 @@ for i in range(200):
     a.send("LASER %d"%((2000)+i*10))
     sleep(0.02)
     respLaser = string.split(a.getResp(),":")
-    """if(respLaser[0]!=("Timeout!")):
-        adcVals.append(respLaser[1])
-    else:
-        respLaser = string.split(a.getResp(),":")
-    """
+    #if(respLaser[0]!=("Timeout!")):
+       # adcVals.append(respLaser[1])
+    #else:
+        #respLaser = string.split(a.getResp(),":")
+    
     while (wombat == False):
         respLaser = string.split(a.getResp(),":")
         if(respLaser[0]!="Timeout!" and respLaser[0]!=""):
@@ -118,7 +119,8 @@ for i in range(200):
                 adcintVals.append(respint)
                 wombat = True
     
-p.figure()
-x = numpy.linspace(2000,4000,len(adcVals))
-p.plot(x,adcVals)
-numpy.savetxt('intensitydata.txt',(x,adcintVals))
+"""
+#p.figure()
+#x = numpy.linspace(2000,4000,len(adcVals))
+#p.plot(x,adcVals)
+#numpy.savetxt('intensitydata.txt',(x,adcintVals))
