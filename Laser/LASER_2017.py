@@ -98,6 +98,7 @@ a.send("STOP")
 a.send("LASER 2500")
 
 adcVals = []
+adcintVals = []
 for i in range(200):
     wombat = False
     a.send("LASER %d"%((2000)+i*10))
@@ -113,9 +114,11 @@ for i in range(200):
         if(respLaser[0]!="Timeout!" and respLaser[0]!=""):
             if(respLaser[1]!=""):
                 adcVals.append(respLaser[1])
+                respint = int(respLaser[1])
+                adcintVals.append(respint)
                 wombat = True
     
 p.figure()
 x = numpy.linspace(2000,4000,len(adcVals))
 p.plot(x,adcVals)
-numpy.savetxt('intensitydata.txt')
+numpy.savetxt('intensitydata.txt',(x,adcintVals))
