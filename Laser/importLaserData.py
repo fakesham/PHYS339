@@ -72,16 +72,3 @@ for i in range(1,20):
     exec("plt.savefig('./brewsterAngles/brewster%d_1.png',dpi=150)"%i)
     exec("plt.plot(xBrewster, brewster%d_2,'.')"%i)
     exec("plt.savefig('./brewsterAngles/brewster%d_2.png',dpi=150)"%i)
-"""
-
-
-s = 2*numpy.pi*f
-s = numpy.multiply(s,xvals)
-s = numpy.subtract(s,p1[1])
-yvals = numpy.sin(s)
-yvals = numpy.multiply(p1[0],yvals)
-yvals = numpy.add(yvals,p1[2])
-
-#plt.plot(xvals,yvals)
-"""
-
