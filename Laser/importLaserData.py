@@ -15,7 +15,8 @@ import os
 
 f =  1/180
 
-x = numpy.arange(0,721,1)
+x = numpy.arange(0,720,1)
+xBrewster = numpy.arange(0,360,1)
 
 intensityData = numpy.loadtxt('./intensitydata.txt')
 
@@ -23,8 +24,10 @@ for i in range(1,20):
     exec("laser%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
 
 for i in range(1,20):
-    exec("brewster%d = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAngle%d.txt')"%(i,i))
+    exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAngle%d.txt')[0]"%(i,i))
+    exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAngle%d.txt')[1]"%(i,i))
     
+
 
 # ----------------------------- Least-squares fitting -----------------------------
 def sineFit(p,x):
@@ -65,8 +68,10 @@ for i in range(1,20):
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
-    exec("plt.plot(x, brewster%d,'.')"%i)
-    exec("plt.savefig('./brewsterAngles/brewster%d.png',dpi=150)"%i)
+    exec("plt.plot(xBrewster, brewster%d_1,'.')"%i)
+    exec("plt.savefig('./brewsterAngles/brewster%d_1.png',dpi=150)"%i)
+    exec("plt.plot(xBrewster, brewster%d_2,'.')"%i)
+    exec("plt.savefig('./brewsterAngles/brewster%d_2.png',dpi=150)"%i)
 """
 
 
