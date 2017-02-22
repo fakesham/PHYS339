@@ -11,45 +11,62 @@ from scipy.optimize import leastsq
 import matplotlib.pyplot as plt
 import os
 
-timeSpacing = 2.24/1000
-# seconds 
-period = 180*timeSpacing
-f =  1/period
+# ----------------------------- Importing data ------------------------------------
 
+f =  1/180
+
+for i in range(1,20):
+    exec("laser%d = numpy.concatenate((numpy.loadtxt('./rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
 
 for i in range(20):
-    exec("laser%d = numpy.concatenate((numpy.loadtxt('laserSineWave%d.txt')[0],numpy.loadtxt('laserSineWave%d.txt')[1]))"%(i,i,i))
+    intensityData = numpy.loadtxt('../intensitydata.txt')
 
-for i in range(20)
-intensityData = numpy.loadtxt('../intensitydata.txt')
+x = numpy.arange(0,720,1)
 
-x = numpy.arange(0,720*2.24,2.24)
-
-plt.plot(intensityData[0],intensityData[1])
 
 # ----------------------------- Least-squares fitting -----------------------------
-# First guess
-fg = [3*numpy.std(laser10)/(2**0.5), 0, numpy.mean(laser10)]
+def sineFit(p,x):
+    #print("p",p)
 
-#a, phi, b
-def residual(p,x,data):
     amp = p[0]
-    print("p",p)
-    phase = p[1] 
+    freq = 2*numpy.pi*f
+    phase = p[1]
     offset = p[2]
     
-    s = 2*numpy.pi*f
-    s = numpy.multiply(s,x)
-    s = numpy.subtract(s,2*numpy.pi*phase)
-    testfit = numpy.sin(s)
-    testfit = numpy.multiply(2*amp,testfit)
-    testfit = numpy.add(testfit,offset)
-    return numpy.square(numpy.subtract(data,testfit))
-        
-        
-p1, success = leastsq(residual,fg,args=(x,laser10),maxfev=10)
+    s = numpy.sin(numpy.multiply(freq, numpy.subtract(x,phase)))
+    return numpy.add(numpy.multiply(amp,s),offset)
+    
+#a, phi, b
+def residual(p,x,y):
+    return numpy.subtract(y,sineFit(p,x))
 
-xvals = numpy.arange(0,max(x),max(x)/1000)
+i = 10 
+for i in range(1,20):
+    exec("amp0 = 0.5*(max(laser%d)-min(laser%d))"%(i,i))
+    exec("phase0 = 0")
+    exec("offset0 = numpy.mean(laser%d)"%i)
+    exec("firstGuess = numpy.array([amp0, phase0, offset0],dtype=float)")
+    exec("print('first guess',firstGuess)")
+    exec("params%d, success%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,laser%d))"%(i,i,i))
+
+
+
+print("parameters",params10)
+
+# ------------------------------- Plots ----------------------------------
+for i in range(1,20):
+    exec("plt.figure(figsize=(8,6), dpi=150)")
+    exec("plt.xlabel('Step number',fontsize=12)")
+    exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
+    exec("plt.xlim([0,720])")
+    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
+    exec("plt.plot(x, laser%d,'.')"%i)
+    exec("plt.plot(x, sineFit(params%d,x))"%i)
+    exec("plt.savefig('sineFit%d.png',dpi=150)"%i)
+#plt.show()
+
+"""
+
 
 s = 2*numpy.pi*f
 s = numpy.multiply(s,xvals)
@@ -59,6 +76,5 @@ yvals = numpy.multiply(p1[0],yvals)
 yvals = numpy.add(yvals,p1[2])
 
 #plt.plot(xvals,yvals)
-#plt.plot(x,laser10,'+')
+"""
 
-plt.plot()
