@@ -62,7 +62,7 @@ class Arduino:
 a = Arduino()
 
 steps = 360
-a.send("LASER 3300")
+a.send("LASER 3200")
 a.getResp()
 a.send("STEPS %d"%(steps))
 a.send("DELAYS 20")
