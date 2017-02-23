@@ -62,10 +62,10 @@ class Arduino:
 a = Arduino()
 
 steps = 360
-a.send("LASER 3300")
+a.send("LASER 3200")
 a.getResp()
 a.send("STEPS %d"%(steps))
-a.send("DELAYS 20")
+a.send("DELAYS 50")
 a.send("START")
 p.figure()
 p.xlabel("Step index")
@@ -86,13 +86,13 @@ while True:
                     i.remove()
             lines[index & 1] = p.plot(range(steps),vector[index & 1,:])  
             p.pause(0.01)
-            exec("numpy.savetxt('./brewsterAngles/rawdata/brewsterAnglebestever%d.txt',vector)"%index)
+            exec("numpy.savetxt('./brewsterAngles/rawdata/polarizationunfiltered%d.txt',vector)"%index)
             index += 1
         vector[index&1,step] = adc
     else:
         print("Unexpected response: %s"%(resp))
         print("Length: %d"%(len(resp)))
-    if 100 == index:
+    if 50 == index:
         break
 a.send("STOP")
 
