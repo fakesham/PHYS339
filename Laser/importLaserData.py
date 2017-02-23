@@ -20,8 +20,10 @@ xBrewster = numpy.arange(0,360,1)
 
 intensityData = numpy.loadtxt('./intensitydata.txt')
 
-for i in range(1,20):
-    exec("laser%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
+for i in range(1,50):
+    exec("filter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[1]))"%(i,i,i))
+    exec("nofilter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[1]))"%(i,i,i))
+
 
 for i in range(1,20):
     exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAnglebestever%d.txt')[0]"%(i,i))
@@ -42,37 +44,65 @@ def sineFit(p,x):
 def residual(p,x,y):
     return numpy.subtract(y,sineFit(p,x))
 
-for i in range(1,20):
-    exec("amp0 = 0.5*(max(laser%d)-min(laser%d))"%(i,i))
+for i in range(1,50):
+    exec("amp0 = 0.5*(max(filter%d)-min(filter%d))"%(i,i))
     exec("phase0 = 0")
-    exec("offset0 = numpy.mean(laser%d)"%i)
+    exec("offset0 = numpy.mean(filter%d)"%i)
     exec("firstGuess = numpy.array([amp0, phase0, offset0],dtype=float)")
-    exec("params%d, success%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,laser%d))"%(i,i,i))
-    exec("res%d = residual(params%d,x,laser%d)"%(i,i,i))
+    exec("paramsF%d, successF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,filter%d))"%(i,i,i))
+    exec("resF%d = residual(paramsF%d,x,filter%d)"%(i,i,i))
+
+    exec("amp0 = 0.5*(max(nofilter%d)-min(nofilter%d))"%(i,i))
+    exec("phase0 = 0")
+    exec("offset0 = numpy.mean(nofilter%d)"%i)
+    exec("firstGuess = numpy.array([amp0, phase0, offset0],dtype=float)")
+    exec("paramsNF%d, successNF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,nofilter%d))"%(i,i,i))
+    exec("resNF%d = residual(paramsNF%d,x,nofilter%d)"%(i,i,i))
 
 
 # ------------------------------- Plots ----------------------------------
 
-# Sinusoidal 
-for i in range(1,20):
+# Sinusoidal - filter
+for i in range(1,50):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
-    exec("plt.errorbar(x, laser%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, sineFit(params%d,x),color='red')"%i)
-    exec("plt.savefig('./sineWaves/sineFit%d.png',dpi=150)"%i)
+    exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
+    exec("plt.plot(x, sineFit(paramsF%d,x),color='red')"%i)
+    exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
 
-# Residuals for sine fit 
-for i in range(1,20):
+# Sinusoidal - no filter
+for i in range(1,50):
+    exec("plt.figure(figsize=(10,10), dpi=150)")
+    exec("plt.xlabel('Step number',fontsize=12)")
+    exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
+    exec("plt.xlim([0,720])")
+    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
+    exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
+    exec("plt.plot(x, sineFit(paramsNF%d,x),color='red')"%i)
+    exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
+
+# Residuals - filter
+for i in range(1,50):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
-    exec("plt.plot(x, res%d,'.')"%i)
-    exec("plt.savefig('./sineWaves/residual%d.png',dpi=150)"%i)
+    exec("plt.plot(x, resF%d,'.')"%i)
+    exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
+
+# Residuals - no filter
+for i in range(1,50):
+    exec("plt.figure(figsize=(10,6), dpi=150)")
+    exec("plt.xlabel('Step number',fontsize=12)")
+    exec("plt.ylabel('Residual value',fontsize=12)")
+    exec("plt.xlim([0,720])")
+    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
+    exec("plt.plot(x, resNF%d,'.')"%i)
+    exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
 
 # Brewster angle 
 for i in range(1,20):
