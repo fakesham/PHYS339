@@ -70,5 +70,12 @@ for i in range(1,20):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(xBrewster, brewster%d_1,'.')"%i)
     exec("plt.savefig('./brewsterAngles/brewster%d_1.png',dpi=150)"%i)
+    
+for i in range(1,20):
+    exec("plt.figure(figsize=(8,6), dpi=150)")
+    exec("plt.xlabel('Step number',fontsize=12)")
+    exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
+    exec("plt.xlim([0,720])")
+    exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(xBrewster, brewster%d_2,'.')"%i)
     exec("plt.savefig('./brewsterAngles/brewster%d_2.png',dpi=150)"%i)
