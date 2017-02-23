@@ -86,13 +86,13 @@ while True:
                     i.remove()
             lines[index & 1] = p.plot(range(steps),vector[index & 1,:])  
             p.pause(0.01)
-            exec("numpy.savetxt('./brewsterAngles/rawdata/polarizationunfiltered%d.txt',vector)"%index)
+            exec("numpy.savetxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt',vector)"%index)
             index += 1
         vector[index&1,step] = adc
     else:
         print("Unexpected response: %s"%(resp))
         print("Length: %d"%(len(resp)))
-    if 50 == index:
+    if 100 == index:
         break
 a.send("STOP")
 
