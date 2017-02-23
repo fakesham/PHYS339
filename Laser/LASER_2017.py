@@ -61,7 +61,7 @@ class Arduino:
 
 a = Arduino()
 
-steps = 360
+steps = 720
 a.send("LASER 3200")
 a.getResp()
 a.send("STEPS %d"%(steps))
@@ -86,13 +86,13 @@ while True:
                     i.remove()
             lines[index & 1] = p.plot(range(steps),vector[index & 1,:])  
             p.pause(0.01)
-            exec("numpy.savetxt('./brewsterAngles/rawdata/brewsterAngle%d.txt',vector)"%index)
+            exec("numpy.savetxt('./brewsterAngles/rawdata/brewsterAngleplaying%d.txt',vector)"%index)
             index += 1
         vector[index&1,step] = adc
     else:
         print("Unexpected response: %s"%(resp))
         print("Length: %d"%(len(resp)))
-    if 20 == index:
+    if 100 == index:
         break
 a.send("STOP")
 
