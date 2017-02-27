@@ -25,9 +25,9 @@ for i in range(1,50):
     exec("nofilter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[1]))"%(i,i,i))
 
 
-for i in range(1,20):
-    exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAnglebestever%d.txt')[0]"%(i,i))
-    exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterAnglebestever%d.txt')[1]"%(i,i))
+for i in range(1,100):
+    exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i))
+    exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[1]"%(i,i))
     
 error = 0.5
 
@@ -105,7 +105,7 @@ for i in range(1,50):
     exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
 
 # Brewster angle 
-for i in range(1,20):
+for i in range(1,100):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
@@ -115,7 +115,7 @@ for i in range(1,20):
     exec("plt.savefig('./brewsterAngles/brewster%d_1.png',dpi=150)"%i)
 
 # Brewster angle 
-for i in range(1,20):
+for i in range(1,100):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
