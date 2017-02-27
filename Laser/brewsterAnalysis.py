@@ -15,13 +15,12 @@ import os
 
 xBrewster = numpy.arange(0,360,1)
 
-angleOnes = numpy.zeros(200)
-angleTwos = numpy.zeros(200)
-spikes = numpy.zeros(200)
+angleOnes = numpy.zeros(100)
+angleTwos = numpy.zeros(100)
 
-for i in range(100): 
-    exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i))
-    exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[1]"%(i,i))
+for i in range(50): 
+    exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i*2))
+    exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[1]"%(i,i*2))
 
 
 def getSpike(data):
@@ -32,6 +31,7 @@ def getSpike(data):
 			ratios.append(data[i]/data[i-2])
 		else:
 			ratios.append(0)
+   
 	return numpy.argmax(ratios)+2
 
 def getAngles(data,index):
@@ -42,16 +42,16 @@ def getAngles(data,index):
 
 	angleOnes[index] = 360-spike+angleOne
 	angleTwos[index] = spike-angleTwo 
-	spikes[index] = spike
 
 
-for i in range(100): 
+for i in range(50): 
 	exec("getAngles(brewster%d_1,%d)"%(i,i))
-for i in range(100):
-	exec("getAngles(brewster%d_2,%d)"%(i,100+i))
+for i in range(50):
+	exec("getAngles(brewster%d_2,%d)"%(i,50+i))
+
+    
+compiledData = numpy.zeros(100)
 
 compiledData = numpy.column_stack((angleOnes,angleTwos))
-for i in range(200):
-	print(angleOnes[i],angleTwos[i])
 
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
