@@ -49,9 +49,22 @@ for i in range(50):
 for i in range(50):
 	exec("getAngles(brewster%d_2,%d)"%(i,50+i))
 
-    
-compiledData = numpy.zeros(100)
+
+#the 50th entry was invalid data (all zeros)
+angleOnes = numpy.delete(angleOnes,50)
+angleTwos = numpy.delete(angleTwos,50)
+
 
 compiledData = numpy.column_stack((angleOnes,angleTwos))
 
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
+
+rootSquareDiff = numpy.sqrt(numpy.square(numpy.subtract(angleOnes,angleTwos)))
+
+plt.figure(figsize=(8,6), dpi=150)
+plt.hist(rootSquareDiff,bins=10,normed=True)
+plt.xlabel("Root squared difference between angles (degrees)",fontsize=12)
+plt.ylabel("Frequency",fontsize=12)
+plt.hist(rootSquareDiff,bins=10)
+plt.savefig('./brewsterAngles/angleDiff.png')
+
