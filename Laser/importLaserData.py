@@ -34,7 +34,7 @@ plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
 plt.plot(x,nopolarizer6)
 plt.savefig('./polarizationCalibration.png')
 
-print(min(nopolarizer6))
+print(1-min(nopolarizer6)/(max(nopolarizer6)-min(nopolarizer6)))
 
 """
 for i in range(1,100):
