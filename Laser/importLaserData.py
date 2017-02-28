@@ -13,7 +13,7 @@ import os
 
 # ----------------------------- Importing data ------------------------------------
 
-f =  1/180
+f =  1.0/180.0
 
 x = numpy.arange(0,720,1)
 xBrewster = numpy.arange(0,360,1)
@@ -24,27 +24,27 @@ for i in range(1,50):
     exec("filter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[1]))"%(i,i,i))
     exec("nofilter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[1]))"%(i,i,i))
 
-
+"""
 for i in range(1,100):
     exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i))
     exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[1]"%(i,i))
-    
+"""
 error = 0.5
 
 # ----------------------------- Least-squares fitting -----------------------------
-def sineFit(p,x):
+def malusFit(p,x):
     amp = p[0]
     freq = 2*numpy.pi*f
     phase = p[1]
     offset = p[2]
     
-    s = numpy.sin(numpy.multiply(freq, numpy.subtract(x,phase)))
+    s = numpy.square(numpy.cos(numpy.multiply(freq, numpy.subtract(x,phase))))
     return numpy.add(numpy.multiply(amp,s),offset)
     
 def residual(p,x,y):
-    return numpy.subtract(y,sineFit(p,x))
+    return numpy.subtract(y,malusFit(p,x))
 
-for i in range(1,50):
+for i in range(1,1):
     exec("amp0 = 0.5*(max(filter%d)-min(filter%d))"%(i,i))
     exec("phase0 = 0")
     exec("offset0 = numpy.mean(filter%d)"%i)
@@ -63,39 +63,39 @@ for i in range(1,50):
 # ------------------------------- Plots ----------------------------------
 
 # Sinusoidal - filter
-for i in range(1,50):
+for i in range(1,2):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, sineFit(paramsF%d,x),color='red')"%i)
-    exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
+    exec("plt.plot(x, malusFit(paramsF%d,x),color='red')"%i)
+    #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
 
 # Sinusoidal - no filter
-for i in range(1,50):
+for i in range(1,2):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, sineFit(paramsNF%d,x),color='red')"%i)
-    exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
+    exec("plt.plot(x, malusFit(paramsNF%d,x),color='red')"%i)
+    #exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
 
 # Residuals - filter
-for i in range(1,50):
+for i in range(1,1):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resF%d,'.')"%i)
-    exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
+    #exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
 
 # Residuals - no filter
-for i in range(1,50):
+for i in range(1,1):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
@@ -103,7 +103,7 @@ for i in range(1,50):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resNF%d,'.')"%i)
     exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
-
+"""
 # Brewster angle 
 for i in range(1,100):
     exec("plt.figure(figsize=(10,10), dpi=150)")
@@ -123,3 +123,4 @@ for i in range(1,100):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(xBrewster, brewster%d_2,yerr=error,fmt='.',ms=5)"%i)
     exec("plt.savefig('./brewsterAngles/brewster%d_2.png',dpi=150)"%i)
+"""
