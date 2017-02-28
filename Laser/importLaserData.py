@@ -38,17 +38,20 @@ def malusFit(p,x):
     phase = p[1]
     offset = p[2]
     
-    s = numpy.square(numpy.cos(numpy.multiply(freq, numpy.subtract(x,phase))))
+    s = numpy.multiply(freq, numpy.subtract(x,phase))
+    s = numpy.cos(s)
+    s = s**2
     return numpy.add(numpy.multiply(amp,s),offset)
     
 def residual(p,x,y):
     return numpy.subtract(y,malusFit(p,x))
 
-for i in range(1,1):
+for i in range(1,2):
     exec("amp0 = 0.5*(max(filter%d)-min(filter%d))"%(i,i))
     exec("phase0 = 0")
     exec("offset0 = numpy.mean(filter%d)"%i)
     exec("firstGuess = numpy.array([amp0, phase0, offset0],dtype=float)")
+    print(firstGuess)
     exec("paramsF%d, successF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,filter%d))"%(i,i,i))
     exec("resF%d = residual(paramsF%d,x,filter%d)"%(i,i,i))
 
@@ -59,11 +62,18 @@ for i in range(1,1):
     exec("paramsNF%d, successNF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,nofilter%d))"%(i,i,i))
     exec("resNF%d = residual(paramsNF%d,x,nofilter%d)"%(i,i,i))
 
-
+plt.show()
 # ------------------------------- Plots ----------------------------------
 
+# Intensity calibration 
+plt.figure(figsize=(10,10), dpi=150)
+plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
+plt.plot(intensityData[0],intensityData[1])
+plt.savefig('./intensityCalibration.png')
+
 # Sinusoidal - filter
-for i in range(1,2):
+for i in range(1,1):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
@@ -74,7 +84,7 @@ for i in range(1,2):
     #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
 
 # Sinusoidal - no filter
-for i in range(1,2):
+for i in range(1,1):
     exec("plt.figure(figsize=(10,10), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
@@ -103,6 +113,7 @@ for i in range(1,1):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resNF%d,'.')"%i)
     exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
+    
 """
 # Brewster angle 
 for i in range(1,100):
