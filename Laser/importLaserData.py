@@ -24,6 +24,18 @@ for i in range(1,50):
     exec("filter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationwithfilter%d.txt')[1]))"%(i,i,i))
     exec("nofilter%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/polarizationunfiltered%d.txt')[1]))"%(i,i,i))
 
+for i in range(1,20):    
+    exec("nopolarizer%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
+
+
+plt.figure(figsize=(10,10), dpi=150)
+plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
+plt.plot(x,nopolarizer6)
+plt.savefig('./polarizationCalibration.png')
+
+print(min(nopolarizer6))
+
 """
 for i in range(1,100):
     exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i))
@@ -62,7 +74,6 @@ for i in range(1,2):
     exec("paramsNF%d, successNF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,nofilter%d))"%(i,i,i))
     exec("resNF%d = residual(paramsNF%d,x,nofilter%d)"%(i,i,i))
 
-plt.show()
 # ------------------------------- Plots ----------------------------------
 
 # Intensity calibration 
@@ -71,6 +82,7 @@ plt.xlabel('Intensity value sent to Arduino',fontsize=12)
 plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
 plt.plot(intensityData[0],intensityData[1])
 plt.savefig('./intensityCalibration.png')
+
 
 # Sinusoidal - filter
 for i in range(1,1):
