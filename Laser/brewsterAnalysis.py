@@ -7,7 +7,7 @@ Created on Thu Feb 16 16:22:09 2017
 
 import numpy 
 import scipy
-from scipy.optimize import leastsq
+from scipy.stats import norm 
 import matplotlib.pyplot as plt
 import os
 
@@ -54,17 +54,25 @@ for i in range(50):
 angleOnes = numpy.delete(angleOnes,50)
 angleTwos = numpy.delete(angleTwos,50)
 
-
 compiledData = numpy.column_stack((angleOnes,angleTwos))
 
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
 
-rootSquareDiff = numpy.sqrt(numpy.square(numpy.subtract(angleOnes,angleTwos)))
+normedDiff = numpy.divide(numpy.subtract(angleOnes,angleTwos),100)
+numBins = numpy.ceil(numpy.sqrt(len(normedDiff)))
+
+normx = numpy.linspace(min(normedDiff),max(normedDiff),100)
+p = norm.pdf(normx, numpy.mean(normedDiff),numpy.std(normedDiff))
+pScaled = numpy.divide(p,numpy.sum(p))
+k = numpy.random.choice(normx,size=10000,p=pScaled)
+
 
 plt.figure(figsize=(8,6), dpi=150)
-plt.hist(rootSquareDiff,bins=10,normed=True)
-plt.xlabel("Root squared difference between angles (degrees)",fontsize=12)
-plt.ylabel("Frequency",fontsize=12)
-plt.hist(rootSquareDiff,bins=10)
+obs = plt.hist(normedDiff,bins=numBins,normed=True,color="grey",label="Observed counts")
+exp = plt.hist(k,bins=numBins,normed=True,histtype="step",label="Expected counts")
+gaussian = plt.plot(normx,p,label="Gaussian distribution for dataset \nmean and standard deviation")
+plt.legend(bbox_to_anchor=(0.47, 1),fontsize=10)
+plt.xlabel("Difference between two Brewster angles found",fontsize=12)
+plt.ylabel("Frequency (normalized)",fontsize=12)
+plt.axes.ylim = [0,10]
 plt.savefig('./brewsterAngles/angleDiff.png')
-
