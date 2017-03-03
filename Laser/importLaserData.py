@@ -13,7 +13,7 @@ import os
 
 # ----------------------------- Importing data ------------------------------------
 
-f =  1.0/180.0
+f =  1.0/360.0
 
 x = numpy.arange(0,720,1)
 xBrewster = numpy.arange(0,360,1)
@@ -26,15 +26,6 @@ for i in range(1,50):
 
 for i in range(1,20):    
     exec("nopolarizer%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
-
-
-plt.figure(figsize=(10,10), dpi=150)
-plt.xlabel('Intensity value sent to Arduino',fontsize=12)
-plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
-plt.plot(x,nopolarizer6)
-plt.savefig('./polarizationCalibration.png')
-
-print(1-min(nopolarizer6)/(max(nopolarizer6)-min(nopolarizer6)))
 
 """
 for i in range(1,100):
@@ -77,35 +68,41 @@ for i in range(1,2):
 # ------------------------------- Plots ----------------------------------
 
 # Intensity calibration 
-plt.figure(figsize=(10,10), dpi=150)
+plt.figure(figsize=(10,6), dpi=150)
 plt.xlabel('Intensity value sent to Arduino',fontsize=12)
 plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
-plt.plot(intensityData[0],intensityData[1])
-plt.savefig('./intensityCalibration.png')
+plt.plot(intensityData[0],intensityData[1],'.')
+#plt.savefig('./intensityCalibration.png')
+plt.show()
 
+# Intensity calibration - with filter 
+plt.figure(figsize=(10,6), dpi=150)
+plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
+plt.plot(x,nopolarizer6,'.')
+plt.savefig('./polarizationCalibration.png')
 
 # Sinusoidal - filter
-
-for i in range(1,1):
-    exec("plt.figure(figsize=(10,10), dpi=150)")
+for i in range(1,2):
+    exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, sineFit(paramsF%d,x),color='red')"%i)
+    exec("plt.plot(x, malusFit(paramsF%d,x),color='red')"%i)
     #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
     plt.show()
 
 # Sinusoidal - no filter
-for i in range(1,1):
-    exec("plt.figure(figsize=(10,10), dpi=150)")
+for i in range(1,2):
+    exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, sineFit(paramsNF%d,x),color='red')"%i)
+    exec("plt.plot(x, malusFit(paramsNF%d,x),color='red')"%i)
     #exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
     plt.show()
 
