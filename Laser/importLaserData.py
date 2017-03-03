@@ -101,9 +101,8 @@ residuals = []
 for i in range(len(bfYvals)):
     residuals.append(bfYvals[i]-observedY[i])
 
-
-
 # ------------------------------- Plots ----------------------------------
+
 """
 # Intensity quadratic fitting 
 plt.figure(figsize=(10,6), dpi=150)
@@ -145,7 +144,8 @@ for i in range(1,50):
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, malusFit(paramsF%d,x),color='red')"%i)
+    exec("plt.plot(x, malusFit(paramsF%d,x),color='red',label='Best-fit curve')"%i)
+    exec("plt.legend(loc='upper right'))
     exec("plt.savefig('./sineWaves/filter/malusFitF%d.png',dpi=150)"%i)
 
 # Sinusoidal - no filter
@@ -156,7 +156,8 @@ for i in range(1,50):
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
-    exec("plt.plot(x, malusFit(paramsNF%d,x),color='red')"%i)
+    exec("plt.plot(x, malusFit(paramsNF%d,x),color='red',label='Best-fit curve')"%i)
+    exec("plt.legend(loc='upper right'))
     exec("plt.savefig('./sineWaves/nofilter/malusFitNF%d.png',dpi=150)"%i)
 
 # Residuals - filter
