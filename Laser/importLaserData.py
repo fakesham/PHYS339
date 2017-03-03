@@ -66,14 +66,63 @@ for i in range(1,50):
 
 # ----------------------------- Quadratic fitting -----------------------------
 
-xInt = numpy.linspace(0,4096,200)
-print(len(xInt))
-print(len(intensityData[1]))
-for i in range()
+
+deltas = [0]
+
+for i in range(1,200):
+    deltas.append(numpy.abs(intensityData[1][i]-intensityData[1][i-1]))
+
+deltas = numpy.divide(deltas,intensityData[0][1]-intensityData[0][0])
+
+start = 0 
+stop = 0 
+
+threshold = numpy.std(deltas)
+
+for i in range(200):
+    if(numpy.abs(deltas[i])<=threshold):
+        continue
+    start = i 
+    break
+
+for i in range(199,start,-1): 
+    if(numpy.abs(deltas[i])<=threshold):
+        continue 
+    stop = i 
+    break
+
+toFitX = intensityData[0][start:stop]
+observedY = intensityData[1][start:stop]
+
+params = numpy.polyfit(toFitX,observedY,2)
+bfYvals = params[0]*toFitX**2+params[1]*toFitX+params[2]
+
+residuals = []
+for i in range(len(bfYvals)):
+    residuals.append(bfYvals[i]-observedY[i])
+
 
 
 # ------------------------------- Plots ----------------------------------
 """
+# Intensity quadratic fitting 
+plt.figure(figsize=(10,6), dpi=150)
+plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
+plt.plot(toFitX,bfYvals,label='Best-fit quadratic curve')
+plt.plot(toFitX,observedY,'.')
+plt.plot(intensityData[0],intensityData[1],'.')
+plt.legend(loc='upper left')
+plt.savefig('./intensityQuadFit.png')
+
+# Residuals for intensity quadratic fitting 
+plt.figure(figsize=(10,5), dpi=150)
+plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.ylabel('Residual value \n(observed return value - actual return value)',fontsize=12)
+plt.axhline(color='black')
+plt.plot(toFitX,residuals,'.')
+plt.savefig('./intensityQuadFitResiduals.png')
+
 # Intensity calibration 
 plt.figure(figsize=(10,6), dpi=150)
 plt.xlabel('Intensity value sent to Arduino',fontsize=12)
