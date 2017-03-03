@@ -58,7 +58,7 @@ compiledData = numpy.column_stack((angleOnes,angleTwos))
 
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
 
-normedDiff = numpy.divide(numpy.subtract(angleOnes,angleTwos),100)
+normedDiff = numpy.subtract(angleOnes,angleTwos)
 numBins = numpy.ceil(numpy.sqrt(len(normedDiff)))
 
 normx = numpy.linspace(min(normedDiff),max(normedDiff),100)
