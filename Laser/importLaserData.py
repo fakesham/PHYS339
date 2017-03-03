@@ -85,53 +85,32 @@ plt.savefig('./intensityCalibration.png')
 
 
 # Sinusoidal - filter
-<<<<<<< HEAD
-for i in range(1,2):
-    exec("plt.figure(figsize=(10,6), dpi=150)")
-=======
+
 for i in range(1,1):
     exec("plt.figure(figsize=(10,10), dpi=150)")
->>>>>>> 4a5adedd87bee62662d27b659453cd9dc356ba64
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
-<<<<<<< HEAD
     exec("plt.plot(x, sineFit(paramsF%d,x),color='red')"%i)
     #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
     plt.show()
 
 # Sinusoidal - no filter
-for i in range(1,2):
-    exec("plt.figure(figsize=(10,6), dpi=150)")
-=======
-    exec("plt.plot(x, malusFit(paramsF%d,x),color='red')"%i)
-    #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
-
-# Sinusoidal - no filter
 for i in range(1,1):
     exec("plt.figure(figsize=(10,10), dpi=150)")
->>>>>>> 4a5adedd87bee62662d27b659453cd9dc356ba64
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
-<<<<<<< HEAD
     exec("plt.plot(x, sineFit(paramsNF%d,x),color='red')"%i)
     #exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
     plt.show()
 
 # Residuals - filter
-for i in range(1,2):
-=======
-    exec("plt.plot(x, malusFit(paramsNF%d,x),color='red')"%i)
-    #exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
-
-# Residuals - filter
 for i in range(1,1):
->>>>>>> 4a5adedd87bee62662d27b659453cd9dc356ba64
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
@@ -139,30 +118,19 @@ for i in range(1,1):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resF%d,'.')"%i)
     #exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
-<<<<<<< HEAD
     plt.show()
 
 # Residuals - no filter
 for i in range(1,2):
-=======
-
-# Residuals - no filter
-for i in range(1,1):
->>>>>>> 4a5adedd87bee62662d27b659453cd9dc356ba64
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resNF%d,'.')"%i)
-<<<<<<< HEAD
     #exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
     plt.show()
 
-=======
-    exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
-    
->>>>>>> 4a5adedd87bee62662d27b659453cd9dc356ba64
 """
 # Brewster angle 
 for i in range(1,100):
