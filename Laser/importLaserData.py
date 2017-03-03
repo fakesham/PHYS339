@@ -11,6 +11,8 @@ from scipy.optimize import leastsq
 import matplotlib.pyplot as plt
 import os
 
+plt.ioff()
+
 # ----------------------------- Importing data ------------------------------------
 
 f =  1.0/360.0
@@ -27,11 +29,9 @@ for i in range(1,50):
 for i in range(1,20):    
     exec("nopolarizer%d = numpy.concatenate((numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[0],numpy.loadtxt('./sineWaves/rawdata/laserSineWave%d.txt')[1]))"%(i,i,i))
 
-"""
 for i in range(1,100):
     exec("brewster%d_1 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[0]"%(i,i))
     exec("brewster%d_2 = numpy.loadtxt('./brewsterAngles/rawdata/brewsterbesteverest%d.txt')[1]"%(i,i))
-"""
 error = 0.5
 
 # ----------------------------- Least-squares fitting -----------------------------
@@ -49,12 +49,11 @@ def malusFit(p,x):
 def residual(p,x,y):
     return numpy.subtract(y,malusFit(p,x))
 
-for i in range(1,2):
+for i in range(1,50):
     exec("amp0 = 0.5*(max(filter%d)-min(filter%d))"%(i,i))
     exec("phase0 = 0")
     exec("offset0 = numpy.mean(filter%d)"%i)
     exec("firstGuess = numpy.array([amp0, phase0, offset0],dtype=float)")
-    print(firstGuess)
     exec("paramsF%d, successF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,filter%d))"%(i,i,i))
     exec("resF%d = residual(paramsF%d,x,filter%d)"%(i,i,i))
 
@@ -65,25 +64,32 @@ for i in range(1,2):
     exec("paramsNF%d, successNF%d = scipy.optimize.leastsq(residual,firstGuess,args=(x,nofilter%d))"%(i,i,i))
     exec("resNF%d = residual(paramsNF%d,x,nofilter%d)"%(i,i,i))
 
-# ------------------------------- Plots ----------------------------------
+# ----------------------------- Quadratic fitting -----------------------------
 
+xInt = numpy.linspace(0,4096,200)
+print(len(xInt))
+print(len(intensityData[1]))
+for i in range()
+
+
+# ------------------------------- Plots ----------------------------------
+"""
 # Intensity calibration 
 plt.figure(figsize=(10,6), dpi=150)
 plt.xlabel('Intensity value sent to Arduino',fontsize=12)
 plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
-plt.plot(intensityData[0],intensityData[1],'.')
-#plt.savefig('./intensityCalibration.png')
-plt.show()
+plt.plot(intensityData[0],intensityData[1],'+')
+plt.savefig('./intensityCalibration.png')
 
 # Intensity calibration - with filter 
 plt.figure(figsize=(10,6), dpi=150)
-plt.xlabel('Intensity value sent to Arduino',fontsize=12)
+plt.xlabel('Intensity value sent to Arduino filter',fontsize=12)
 plt.ylabel('Photoresistor reading value returned from Arduino',fontsize=12)
 plt.plot(x,nopolarizer6,'.')
 plt.savefig('./polarizationCalibration.png')
 
 # Sinusoidal - filter
-for i in range(1,2):
+for i in range(1,50):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
@@ -91,11 +97,10 @@ for i in range(1,2):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, filter%d,yerr=error,fmt='.',ms=5)"%i)
     exec("plt.plot(x, malusFit(paramsF%d,x),color='red')"%i)
-    #exec("plt.savefig('./sineWaves/filter/sineFitF%d.png',dpi=150)"%i)
-    plt.show()
+    exec("plt.savefig('./sineWaves/filter/malusFitF%d.png',dpi=150)"%i)
 
 # Sinusoidal - no filter
-for i in range(1,2):
+for i in range(1,50):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Value returned from Arduino',fontsize=12)")
@@ -103,32 +108,28 @@ for i in range(1,2):
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.errorbar(x, nofilter%d,yerr=error,fmt='.',ms=5)"%i)
     exec("plt.plot(x, malusFit(paramsNF%d,x),color='red')"%i)
-    #exec("plt.savefig('./sineWaves/nofilter/sineFitNF%d.png',dpi=150)"%i)
-    plt.show()
+    exec("plt.savefig('./sineWaves/nofilter/malusFitNF%d.png',dpi=150)"%i)
 
 # Residuals - filter
-for i in range(1,1):
+for i in range(1,50):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resF%d,'.')"%i)
-    #exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
-    plt.show()
+    exec("plt.savefig('./sineWaves/residualsfilter/residualF%d.png',dpi=150)"%i)
 
 # Residuals - no filter
-for i in range(1,2):
+for i in range(1,50):
     exec("plt.figure(figsize=(10,6), dpi=150)")
     exec("plt.xlabel('Step number',fontsize=12)")
     exec("plt.ylabel('Residual value',fontsize=12)")
     exec("plt.xlim([0,720])")
     exec("plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))")
     exec("plt.plot(x, resNF%d,'.')"%i)
-    #exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
-    plt.show()
+    exec("plt.savefig('./sineWaves/residualsnofilter/residualNF%d.png',dpi=150)"%i)
 
-"""
 # Brewster angle 
 for i in range(1,100):
     exec("plt.figure(figsize=(10,10), dpi=150)")
