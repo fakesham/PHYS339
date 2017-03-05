@@ -55,11 +55,23 @@ for i in range(50):
 #the 50th entry was invalid data (all zeros)
 angleOnes = numpy.delete(angleOnes,50)
 angleTwos = numpy.delete(angleTwos,50)
+print("Angle ones mean:",numpy.mean(angleOnes))
+print("Angle ones standard deviation:",numpy.std(angleOnes))
+print("Angle twos mean:",numpy.mean(angleTwos))
+print("Angle twos standard deviation:",numpy.std(angleTwos))
 
 # ----------------------------- Compiling/saving processed data -----------------------------
 
 compiledData = numpy.column_stack((angleOnes,angleTwos))
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
+
+q = numpy.ndarray.flatten(compiledData)
+print("Overall mean:",numpy.mean(q))
+print("Overall standard deviation:",numpy.std(q))
+
+# ----------------------------- T-test -----------------------------
+t,pval = scipy.stats.ttest_rel(angleOnes,angleTwos)
+print("T-test p value:",pval)
 
 # ----------------------------- Comparison with Gaussian  -----------------------------
 
