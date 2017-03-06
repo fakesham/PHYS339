@@ -55,10 +55,11 @@ for i in range(50):
 #the 50th entry was invalid data (all zeros)
 angleOnes = numpy.delete(angleOnes,50)
 angleTwos = numpy.delete(angleTwos,50)
-print("Angle ones mean:",numpy.mean(angleOnes))
-print("Angle ones standard deviation:",numpy.std(angleOnes))
-print("Angle twos mean:",numpy.mean(angleTwos))
-print("Angle twos standard deviation:",numpy.std(angleTwos))
+stderr1 = numpy.std(angleOnes)/numpy.sqrt(len(angleOnes))
+stderr2 = numpy.std(angleTwos)/numpy.sqrt(len(angleTwos))
+
+print("Angle ones: "+str(numpy.mean(angleOnes))+" (+/-) "+str(stderr1))
+print("Angle twos: "+str(numpy.mean(angleTwos))+" (+/-) "+str(stderr2))
 
 # ----------------------------- Compiling/saving processed data -----------------------------
 
@@ -66,12 +67,31 @@ compiledData = numpy.column_stack((angleOnes,angleTwos))
 numpy.savetxt('./brewsterAngles/angleData.txt',compiledData)
 
 q = numpy.ndarray.flatten(compiledData)
-print("Overall mean:",numpy.mean(q))
-print("Overall standard deviation:",numpy.std(q))
 
+print("Final angle: "+str(numpy.mean(q))+"(+/-) "+str(numpy.std(q)/numpy.sqrt(len(q))))
+
+stderr = numpy.std(q)/numpy.sqrt(len(q))
+
+# ----------------------------- Index of refraction -----------------------------
+
+meanAngle = numpy.mean(q)*numpy.pi/180.0
+meanAngleOne = numpy.mean(angleOnes)*numpy.pi/180.0
+meanAngleTwo = numpy.mean(angleTwos)*numpy.pi/180.0
+stderr = numpy.std(q)/numpy.sqrt(len(q))*numpy.pi/180.0
+stderr1 = numpy.std(angleOnes)/numpy.sqrt(len(angleOnes))*numpy.pi/180.0
+stderr2 = numpy.std(angleTwos)/numpy.sqrt(len(angleTwos))*numpy.pi/180.0
+
+print("n1 overall = "+str(numpy.tan(meanAngle))+" (+/-) "+str(numpy.square(stderr/numpy.cos(meanAngle)**2)))
+print("n1 angle 1 = "+str(numpy.tan(meanAngleOne))+" (+/-) "+str(numpy.square(stderr1/numpy.cos(meanAngleOne)**2)))
+print("n1 angle 2 = "+str(numpy.tan(meanAngleTwo))+" (+/-) "+str(numpy.square(stderr2/numpy.cos(meanAngleTwo)**2)))
+
+manAngle = 57.64*numpy.pi/180.0
+manErr = 0.01*numpy.pi/180.0
+print("n1 manual = "+str(numpy.tan(manAngle))+" (+/-) "+str(numpy.square(manErr/numpy.cos(manAngle)**2)))
 # ----------------------------- T-test -----------------------------
+
 t,pval = scipy.stats.ttest_rel(angleOnes,angleTwos)
-print("T-test p value:",pval)
+print("T-test p value: "+str(pval))
 
 # ----------------------------- Comparison with Gaussian  -----------------------------
 
