@@ -66,7 +66,6 @@ for i in range(1,50):
 
 # ----------------------------- Quadratic fitting -----------------------------
 
-
 deltas = [0]
 
 for i in range(1,200):
@@ -100,6 +99,26 @@ bfYvals = params[0]*toFitX**2+params[1]*toFitX+params[2]
 residuals = []
 for i in range(len(bfYvals)):
     residuals.append(bfYvals[i]-observedY[i])
+
+# ----------------------------- Polarization -----------------------------
+
+minAngles = []
+maxAngles = []
+
+for i in range(1,50):
+    exec("minAngles.append(min(nofilter%d[0:90]))"%i)
+    exec("minAngles.append(min(nofilter%d[90:270]))"%i)
+    exec("minAngles.append(min(nofilter%d[270:450]))"%i)
+    exec("minAngles.append(min(nofilter%d[450:630]))"%i)
+    exec("maxAngles.append(max(nofilter%d[0:180]))"%i)
+    exec("maxAngles.append(max(nofilter%d[180:360]))"%i)
+    exec("maxAngles.append(max(nofilter%d[360:540]))"%i)
+    exec("maxAngles.append(max(nofilter%d[540:719]))"%i)
+
+
+print("Bottom of sine wave: "+str(numpy.mean(minAngles))+" +/- "+str(numpy.std(minAngles)))
+print("Top of sine wave: "+str(numpy.mean(maxAngles))+" +/- "+str(numpy.std(maxAngles)))
+
 
 # ------------------------------- Plots ----------------------------------
 
