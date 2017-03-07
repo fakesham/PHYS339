@@ -89,6 +89,7 @@ void userStart() {
 /*
  * This function is called when the algorithm is started
  */
+
   out = 0;
 }
 
