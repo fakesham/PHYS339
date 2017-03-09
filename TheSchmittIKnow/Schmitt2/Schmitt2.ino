@@ -20,9 +20,9 @@ double integralsum;
 
 //Three doubles corresponding to the tuning constants on the proportional, integral, and derivative 
 //#terms of the control function
-double ca;
-double cb;
-double cc;
+double ca = 100;
+double cb = 50;
+double cc = 1;
 
 //#takes the current error, last last error, the existing sum of the integral
 //#and the change in time between each two points of the integral
@@ -116,13 +116,25 @@ void userAction() {
   //#(Why is the thing in the manual referred to as error?)
   //#Think we can have constants on the integral and derivative response, and leave proportional fixed(?)
   //#Think we may have to go up to where error is defined and flip it
-  double proportional = (ca*error);
+  double proportional = 0;//(ca*error);
   
-  double derivative = (cb*differentiate(error, prevError, dt));
+  double derivative = 0;//(cb*differentiate(error, prevError, dt*N));
   
-  double integral = (cc*(integration(error,prevError,integralsum,dt)));
+  double integral = (cc*(integration(error,prevError,integralsum,dt*N)));
+  integralsum = integral;
+
+  double outbeforeroot = (((1/2)-proportional-derivative-integral)*255);
+
+  if (outbeforeroot < 0) { outbeforeroot = 0; }
   
-  out = ((1/2)*(proportional+derivative+integral)*255);
+  out = sqrt(outbeforeroot);
+
+   if (out < 0) {
+    out = 0;
+  } else if (out > 255) {
+    out = 255;
+  }
+  
   int dacVal = out;
   
   analogWrite(11, dacVal);

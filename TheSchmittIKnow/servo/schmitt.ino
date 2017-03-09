@@ -50,7 +50,7 @@ void userAction() {
   int value;
   const int N = 16; /* number of samples measured per time step */
   for (int i = 0; i < N; i++) { /* record N samples */
-    value = analogRead(0);
+    value = analogRead(A0);
     sum += value; /* used to calculate mean */
     sumsq += value*(long)value; /* used to calulate variance, need to type cast to long because int is 16 bit */
   }

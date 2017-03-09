@@ -46,7 +46,7 @@ void loop() {
     case 3: // get_sampling_period
       Serial.readBytes((char*)&iterations,2);
       ((unsigned long *)buffer)[1] = micros();
-      while (iterations--) rc = analogRead(0);
+      while (iterations--) rc = analogRead(A0);
       ((unsigned long *)buffer)[0] = micros() - ((unsigned long *)buffer)[1];      
       Serial.write(buffer,4);
       break;
