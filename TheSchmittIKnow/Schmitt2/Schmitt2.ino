@@ -17,10 +17,14 @@ double Tset;
 double band;
 double out;
 double integralsum;
+double outbeforeroot; 
+double proportional; 
+double derivative; 
+double integral; 
 
 //Three doubles corresponding to the tuning constants on the proportional, integral, and derivative 
 //#terms of the control function
-double ca = 100;
+double ca = 100; 
 double cb = 50;
 double cc = 1;
 
@@ -61,11 +65,21 @@ void userSetup() {
   RECORD(temperature,"K");
   RECORD(e_temperature,"K");
   RECORD(error,"");
+  RECORD(ca,"arb"); 
+  RECORD(cb,"arb"); 
+  RECORD(cc,"arb"); 
+  RECORD(outbeforeroot,"");
+  RECORD(derivative,""); 
+ 
+ 
 //  RECORD(derivative,"s<sup>-1</sup>"); /* you can use HTML, this will disp[ay a super-script */
   RECORD(out,"DAC units");
   INITIALIZE(dt,0.1,"s");
   INITIALIZE(Tset,350,"K");
   INITIALIZE(band,5,"K");
+  INITIALIZE(ca,0,"arb"); 
+  INITIALIZE(cb,0,"arb"); 
+  INITIALIZE(cc,0,"arb");
 }
 
 void userAction() {
@@ -116,24 +130,31 @@ void userAction() {
   //#(Why is the thing in the manual referred to as error?)
   //#Think we can have constants on the integral and derivative response, and leave proportional fixed(?)
   //#Think we may have to go up to where error is defined and flip it
-  double proportional = 0;//(ca*error);
   
-  double derivative = 0;//(cb*differentiate(error, prevError, dt*N));
+  proportional = (ca*error);
   
-  double integral = (cc*(integration(error,prevError,integralsum,dt*N)));
-  integralsum = integral;
+  derivative = (cb*differentiate(error, prevError, dt*N));
+  
+  //integral = (cc*(integration(error,prevError,integralsum,dt*N)));
+  //integralsum = integral;
 
-  double outbeforeroot = (((1/2)-proportional-derivative-integral)*255);
+  outbeforeroot = (((1/2)-proportional-derivative-integral));
 
   if (outbeforeroot < 0) { outbeforeroot = 0; }
   
-  out = sqrt(outbeforeroot);
+  out = sqrt(outbeforeroot)*255;
 
+  if(out>255){
+    out = 255; 
+  }
+
+  /**
    if (out < 0) {
     out = 0;
   } else if (out > 255) {
     out = 255;
   }
+  **/
   
   int dacVal = out;
   
@@ -156,6 +177,44 @@ void userStop() {
  */
  analogWrite(11, 0); /* turn off power */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**********************************************
  * Don't worry about the code below this line *
