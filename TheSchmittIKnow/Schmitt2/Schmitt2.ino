@@ -12,6 +12,7 @@ double dt;
 double temperature;
 double e_temperature;
 double error;
+double dacVal; 
 double prevError;
 double Tset;
 double band;
@@ -21,12 +22,14 @@ double outbeforeroot;
 double proportional; 
 double derivative; 
 double integral; 
+double deltaT; 
+double power; 
+double count = 0;
 
 //Three doubles corresponding to the tuning constants on the proportional, integral, and derivative 
 //#terms of the control function
-double ca = 100; 
-double cb = 50;
-double cc = 1;
+double cb = 0;
+double iat = 8;
 
 //#takes the current error, last last error, the existing sum of the integral
 //#and the change in time between each two points of the integral
@@ -38,6 +41,7 @@ double integration (double currentval, double lastval, double sum, double deltat
  double height = ((currentval+lastval)/2);
  
  double area = height*deltat;
+ deltaT = deltat; 
  
  return (area+sum);
 }
@@ -65,10 +69,9 @@ void userSetup() {
   RECORD(temperature,"K");
   RECORD(e_temperature,"K");
   RECORD(error,"");
-  RECORD(ca,"arb"); 
-  RECORD(cb,"arb"); 
-  RECORD(cc,"arb"); 
-  RECORD(outbeforeroot,"");
+  RECORD(count,""); 
+  RECORD(dacVal,"");
+  RECORD(integralsum,""); 
   RECORD(derivative,""); 
  
  
@@ -77,9 +80,8 @@ void userSetup() {
   INITIALIZE(dt,0.1,"s");
   INITIALIZE(Tset,350,"K");
   INITIALIZE(band,5,"K");
-  INITIALIZE(ca,0,"arb"); 
-  INITIALIZE(cb,0,"arb"); 
-  INITIALIZE(cc,0,"arb");
+  INITIALIZE(cb,1,"arb"); 
+  INITIALIZE(iat,8,"s");
 }
 
 void userAction() {
@@ -108,8 +110,6 @@ void userAction() {
   e_temperature = eVThermo * vThermo;
   prevError = error;
   error = (temperature - Tset) / band;
-  double Ton = Tset - band / 2;
-  double Toff = Tset + band / 2;
 
   /*
   if ((out > 0) && (temperature > Toff)) {
@@ -130,34 +130,22 @@ void userAction() {
   //#(Why is the thing in the manual referred to as error?)
   //#Think we can have constants on the integral and derivative response, and leave proportional fixed(?)
   //#Think we may have to go up to where error is defined and flip it
-  
-  proportional = (ca*error);
-  
-  derivative = (cb*differentiate(error, prevError, dt*N));
-  
-  //integral = (cc*(integration(error,prevError,integralsum,dt*N)));
-  //integralsum = integral;
 
-  outbeforeroot = (((1/2)-proportional-derivative-integral));
-
-  if (outbeforeroot < 0) { outbeforeroot = 0; }
   
-  out = sqrt(outbeforeroot)*255;
+  derivative = (cb*differentiate(error, prevError, dt));
+  integralsum = (1/iat*(integration(error,prevError,integralsum,dt)));
 
-  if(out>255){
-    out = 255; 
-  }
+  integral = integral+integralsum; 
 
-  /**
-   if (out < 0) {
-    out = 0;
-  } else if (out > 255) {
-    out = 255;
-  }
-  **/
+  power = 0.5 - error - derivative - integral;
+  if (power > 1) power = 1;
+  if (power < 0) power = 0;
+  if (fabs(error) > 0.5) integral = 0;
+  out = sqrt(power)*255;
+  
   
   int dacVal = out;
-  
+    
   analogWrite(11, dacVal);
   
 }
