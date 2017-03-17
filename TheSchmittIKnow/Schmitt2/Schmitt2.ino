@@ -33,7 +33,7 @@ double iat = 8;
 
 //#takes the current error, last last error, the existing sum of the integral
 //#and the change in time between each two points of the integral
-double integration (double currentval, double lastval, double sum, double deltat) 
+double integration (double currentval, double lastval, double deltat) 
 {
  //#calculate distance between current and set value (e.g the height of the function)
  //# think we should absolute value this, but that can be done afterwards
@@ -41,9 +41,8 @@ double integration (double currentval, double lastval, double sum, double deltat
  double height = ((currentval+lastval)/2);
  
  double area = height*deltat;
- deltaT = deltat; 
  
- return (area+sum);
+ return (area);
 }
 
 double differentiate (double currentval, double lastval, double distance) 
@@ -69,9 +68,9 @@ void userSetup() {
   RECORD(temperature,"K");
   RECORD(e_temperature,"K");
   RECORD(error,"");
-  RECORD(count,""); 
+  RECORD(count,"muah hah hah"); 
   RECORD(dacVal,"");
-  RECORD(integralsum,""); 
+  RECORD(integralsum,"burgers"); 
   RECORD(derivative,""); 
  
  
@@ -133,14 +132,15 @@ void userAction() {
 
   
   derivative = (cb*differentiate(error, prevError, dt));
-  integralsum = (1/iat*(integration(error,prevError,integralsum,dt)));
+  integral = (1/iat*(integration(error,prevError,dt)));
 
-  integral = integral+integralsum; 
-
-  power = 0.5 - error - derivative - integral;
+  integralsum += integral;
+  if (fabs(error) > 0.5) integralsum = 0;
+  power = 0.5 - error + derivative - integralsum;
   if (power > 1) power = 1;
   if (power < 0) power = 0;
-  if (fabs(error) > 0.5) integral = 0;
+  
+  
   out = sqrt(power)*255;
   
   

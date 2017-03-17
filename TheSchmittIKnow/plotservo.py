@@ -1,11 +1,16 @@
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import numpy
+import os 
 
+files = os.listdir('./servo')
 
-data = numpy.load('./servo/servo.npz')
-d = data.files
+numpy.load('./servo/cooling.npz')
 
-
-plt.plot(data['time'][0],data['temperature'][0])
-plt.show()
+"""
+for f in files: 
+    if('.npz' in f):
+        toOpen = './servo/'+f
+        numpy.load(toOpen)
+        break
+"""
