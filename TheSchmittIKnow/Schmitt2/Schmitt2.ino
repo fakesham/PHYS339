@@ -136,6 +136,8 @@ void userAction() {
 
   integralsum += integral;
   if (fabs(error) > 0.5) integralsum = 0;
+  derivative = 0;
+  integralsum = 0; 
   power = 0.5 - error + derivative - integralsum;
   if (power > 1) power = 1;
   if (power < 0) power = 0;
