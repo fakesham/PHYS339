@@ -112,12 +112,11 @@ for i in range(1,4):
 	exec("phi_%d = phi(sw%d[1])"%(i,i))
 
 # phase shift with no pressure
-phi0 = phi(maxintensity)
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
 for i in range(1,4):
- 	exec("nt_%d = n0*(numpy.add(d*numpy.divide(phi_%d,2*numpy.pi),1))"%(i,i))
+ 	exec("nt_%d = n0*(numpy.subtract(1,d*numpy.divide(phi_%d,2*numpy.pi)))"%(i,i))
 
 print(numpy.mean(nt_pred))
 print(numpy.mean(nt_1))
@@ -158,7 +157,7 @@ for i in range(1,4):
 	plt.ylabel("$\phi$ (rad)",fontsize=12)
 	plt.title("Phase shift angle vs. time")
 	exec("plt.xlim([0,max(sw%d[0])])"%(i))
-	exec("plt.errorbar(sw%d[0],phi_%d,yerr=phierr,fmt='+')"%(i,i))
+	exec("plt.plot(sw%d[0],phi_%d,'+')"%(i,i))
 	exec("plt.savefig('phase%d.png',dpi=500)"%(i))
 
 for i in range(1,4):
