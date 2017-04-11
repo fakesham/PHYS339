@@ -42,7 +42,7 @@ for i in range(1,4):
 	f.close()
 	exec("sw%d = numpy.transpose(sw%d)"%(i,i))
 	exec("sw%d[1] = sw%d[1]-min(sw%d[1])"%(i,i,i))
-	
+	exec("sw%d[0] = sw%d[0]-min(sw%d[0])"%(i,i,i))
 
 # ----------------------------- DATA PARAMETERS -----------------------------
 
@@ -97,33 +97,33 @@ for i in range(1,4):
 	exec("phi_%d = phi(sw%d[1])"%(i,i))
 
 # phase shift with no pressure
-phi0 = phi(maxintensity)
+phi0 = numpy.add(phi(maxintensity),-2*numpy.pi)
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
-plt.plot(sw1[0],phi0)
-print(phi0)
-
 for i in range(1,4):
- 	exec("nt_%d = n0*(d*numpy.divide(phi_%d,phi0)-1)"%(i,i))
+ 	exec("nt_%d = n0*(numpy.add(d*numpy.divide(phi_%d,2*numpy.pi),1))"%(i,i))
 
 print(nt_pred)
 print(nt_1)
 print(nt_2)
 print(nt_3)
 
+plt.plot(sw1[0],nt_1)
+plt.show()
+
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
 
 def cos2(p,x): 
 	amp = p[0]
 	phase = p[1] 
-	freq = 2*numpy.pi*fs
+	freq = p[2]
 
 	s = numpy.multiply(freq, numpy.subtract(x,phase))
 	s = numpy.cos(s)
-	s = numpy.square(s)
+	s = numpy.multiply(amp,s)
 
-	return numpy.multiply(amp,s)
+	return numpy.square(s)
 
 def residual(p,x,y):
 	return numpy.subtract(y,cos2(p,x))
@@ -132,12 +132,14 @@ def residual(p,x,y):
 # --------------------------- EVALUATION OF FIT ------------------------------
 
 for i in range(1,2): 
-	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0]"%(i,i))
-	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]))"%(i,i,i,i))
+	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,700]"%(i,i))
+	print(fg)
+	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=100000)"%(i,i,i,i))
 
-#plt.plot(t0,cos2(params_1,t0))
-#plt.plot(sw1[0],sw1[1])
-#plt.show()
+print(params_1)
+plt.plot(sw1[0],cos2(params_1,sw1[0]))
+plt.plot(sw1[0],sw1[1],'+')
+plt.show()
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
