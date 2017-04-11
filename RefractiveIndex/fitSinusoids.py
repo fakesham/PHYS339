@@ -4,9 +4,27 @@ import matplotlib.pyplot as plt
 
 # ----------------------------- IMPORTING DATA ------------------------------
 
-for i in range(1,1):
-	exec("t%d = numpy.loadtxt('%s')"%(i,xvals))
-	exec("data_%d = numpy.loadtxt('%s')"%(i,yvals))
+for i in range(1,4):
+	exec("f = open('./data/sw%d.csv','r')"%(i))
+	exec("sw%d = []"%(i))
+	for line in f:
+		l = line.strip('\n').strip('\r').split(',')
+		try:
+			l = [float(n) for n in l]
+			exec("sw%d.append(l)"%(i))
+		except ValueError,e:
+			print(line)
+	f.close()
+	exec("sw%d = numpy.transpose(sw%d)"%(i,i))
+	plt.figure(figsize=(10,6), dpi=150)
+	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Signal (V)",fontsize=12)
+	plt.title("Photodiode response to interference vs. time")
+	exec("plt.xlim([0,max(sw%d[0])])"%(i))
+	exec("plt.errorbar(sw%d[0],sw%d[1],yerr=0.00005,fmt='+')"%(i,i))
+	exec("plt.savefig('sw%d.png',dpi=500)"%(i))
+	plt.show()
 
 # ----------------------------- DATA PARAMETERS -----------------------------
 
@@ -16,13 +34,13 @@ f = 1000
 # ambient pressure, Pa 
 patm = 101000
 
+# tube diameter, m
+d = 10.0/100
+
 # tube length, m 
 l = 56.0/100
 # wavelength of sound, m - first harmonic
 ws = 4*d
-
-# tube diameter, m
-l = 10.0/100
 
 # baseline refractive index of air 
 nair = 1.0
@@ -38,7 +56,7 @@ fs = 343.0/ws
 
 # reference sound pressure in air 
 p0 = 2.0*10**(-5)
-
+"""
 # predicted ntube times 
 t0 = numpy.linspace(0,max(t1))
 
@@ -60,7 +78,7 @@ for i in range(1,1):
 	exec("phi_%d = phi(data_%d)"%(i,i))
 
 def phi(data):
-	return (2*numpy.arccos(numpy.sqrt(2*data/I0))
+	return (2*numpy.arccos(numpy.sqrt(2*data/I0)))
 
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
@@ -94,7 +112,7 @@ for i in range(1,2):
 
 # ------------------------------- TESTING CODE -------------------------------
 
-"""test = numpy.arange(0,25,0.1)
+test = numpy.arange(0,25,0.1)
 sin1 = numpy.multiply(5,numpy.sin(test))
 sin1 = sin1+10
 test2 = test+2
