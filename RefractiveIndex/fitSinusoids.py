@@ -1,6 +1,7 @@
 import numpy 
 from scipy.optimize import leastsq 
 import matplotlib.pyplot as plt 
+import scipy.io
 
 # ----------------------------- IMPORTING DATA ------------------------------
 
@@ -44,6 +45,16 @@ for i in range(1,4):
 	exec("sw%d[1] = sw%d[1]-min(sw%d[1])"%(i,i,i))
 	exec("sw%d[0] = sw%d[0]-min(sw%d[0])"%(i,i,i))
 
+sound = scipy.io.loadmat('./data/181hz.mat')
+sound_sw1 = numpy.transpose(sound['y'])
+t_sw1 = numpy.transpose(sound['x'])
+sound = scipy.io.loadmat('./data/494.mat')
+sound_sw2 = numpy.transpose(sound['y'])
+t_sw2 = numpy.transpose(sound['x'])
+sound = scipy.io.loadmat('./data/777.mat')
+sound_sw3 = numpy.transpose(sound['x'])
+t_sw3 = numpy.transpose(sound['y'])
+
 # ----------------------------- DATA PARAMETERS -----------------------------
 
 # frequency of light, Hz 
@@ -67,7 +78,7 @@ n0 = 1.0
 I0 = numpy.mean(maxintensity)
 
 # decibel level of sound 
-L = 0
+L = -10
 
 # frequency of sound, Hz 
 fs = 343.0/ws
@@ -78,11 +89,9 @@ p0 = 2.0*10**(-5)
 # predicted ntube times 
 t0 = numpy.linspace(min(sw1[0]),max(sw1[0]),1500)
 
-phierr = 0
-
 # -------------------------- PRED. REFRACTIVE INDEX -------------------------
 
-# sound wave pressure 
+# sound wave pressure, Pa 
 p = 10**((p0*L)/20)
 # predicted tube refractive index 
 nt_pred = n0+p/patm*numpy.sin(2*numpy.pi*fs*t0+numpy.pi)
@@ -90,27 +99,30 @@ nt_pred = n0+p/patm*numpy.sin(2*numpy.pi*fs*t0+numpy.pi)
 # ----------------------------- PHASE SHIFT ---------------------------------
 
 def phi(data):
-	return(numpy.multiply(2,numpy.arccos(numpy.sqrt(numpy.abs(numpy.divide(data,maxintensity))))))
+	toreturn = []
+	for i in range(len(data)):
+		if(numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))>1):
+			toreturn.append(2*numpy.arccos(1))
+		else:
+			toreturn.append(2*numpy.arccos(-numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))))
+	return(toreturn)
 
 # phi(t) for all data sets
 for i in range(1,4): 
 	exec("phi_%d = phi(sw%d[1])"%(i,i))
 
 # phase shift with no pressure
-phi0 = numpy.add(phi(maxintensity),-2*numpy.pi)
+phi0 = phi(maxintensity)
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
 for i in range(1,4):
  	exec("nt_%d = n0*(numpy.add(d*numpy.divide(phi_%d,2*numpy.pi),1))"%(i,i))
 
-print(nt_pred)
-print(nt_1)
-print(nt_2)
-print(nt_3)
-
-plt.plot(sw1[0],nt_1)
-plt.show()
+print(numpy.mean(nt_pred))
+print(numpy.mean(nt_1))
+print(numpy.mean(nt_2))
+print(numpy.mean(nt_3))
 
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
 
@@ -118,6 +130,7 @@ def cos2(p,x):
 	amp = p[0]
 	phase = p[1] 
 	freq = p[2]
+	off = p[3]
 
 	s = numpy.multiply(freq, numpy.subtract(x,phase))
 	s = numpy.cos(s)
@@ -132,14 +145,8 @@ def residual(p,x,y):
 # --------------------------- EVALUATION OF FIT ------------------------------
 
 for i in range(1,2): 
-	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,700]"%(i,i))
-	print(fg)
-	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=100000)"%(i,i,i,i))
-
-print(params_1)
-plt.plot(sw1[0],cos2(params_1,sw1[0]))
-plt.plot(sw1[0],sw1[1],'+')
-plt.show()
+	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,700,numpy.mean(sw%d[1])]"%(i,i,i))
+	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=1000)"%(i,i,i,i))
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
