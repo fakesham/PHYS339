@@ -132,7 +132,7 @@ for i in range(1,4):
 	exec("nt_%d = 1+numpy.divide(numpy.multiply(wl,numpy.divide(phi_%d,phi0)),d)"%(i,i))
 
 
-# ----------------------------- INTENSITY FITTING DATA ---------------------------
+# ----------------------------- INTENSITY FITTING DATA ----------------------
 
 def cos2(p,x): 
 	amp = p[0]
@@ -143,7 +143,6 @@ def cos2(p,x):
 	s = numpy.multiply(2*numpy.pi*freq, numpy.subtract(x,phase))
 	s = numpy.cos(s)
 	s = numpy.multiply(amp,s)
-	#s = numpy.square(s)
 
 	return numpy.add(s,off)
 
@@ -151,7 +150,7 @@ def residual(p,x,y):
 	return numpy.subtract(y,cos2(p,x))
 
 
-# --------------------------- EVALUATION OF FIT ------------------------------
+# --------------------------- EVALUATION OF FIT -----------------------------
 
 # frequencies of sound waves used
 freqs = [181,494,777]
@@ -163,17 +162,6 @@ for i in range(1,4):
 for i in range(1,4): 
 	exec("fg = [(max(sound_sw%d)-min(sound_sw%d)),0.0,freqs[%d-1],numpy.mean(sound_sw%d)]"%(i,i,i,i))
 	exec("params_sound%d,success_sound%d = leastsq(residual,fg,args=(t_sw%d,sound_sw%d),maxfev=100000)"%(i,i,i,i))
-	plt.figure(figsize=(10,6), dpi=150)
-	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Voltage reading (V)",fontsize=12)
-	exec("t1 = numpy.linspace(min(t_sw%d),max(t_sw%d),1500)"%(i,i))
-	exec("plt.plot(t1,cos2(params_sound%d,t1),label='Best-fit curve')"%(i))
-	exec("plt.plot(t_sw%d,sound_sw%d,'.',markersize=3)"%(i,i))
-	exec("plt.xlim([0,max(t_sw%d)])"%i)
-	exec("plt.savefig('./bestfitsound%d.png',dpi=500)"%i)
-
-print(params_sound1)
 
 # ----------------------------- PRINTING DATA --------------------------------
 
@@ -183,10 +171,16 @@ print(numpy.mean(nt_2))
 print(numpy.mean(nt_3))
 
 print("-----------------------------")
-print("FREQUENCIES")
+print("FREQUENCIES (photosensor reading, sound sensor)")
+print("First harmonic")
 print(params_1[2])
+print(params_sound1[2])
+print("Second harmonic")
 print(params_2[2])
+print(params_sound2[2])
+print("Third harmonic")
 print(params_3[2])
+print(params_sound3[2])
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
@@ -232,6 +226,16 @@ exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]),label='Best-fit curve')"%(i,i,i))
 exec("plt.plot(sw%d[0],sw%d[1],'.',markersize=3)"%(i,i))
 exec("plt.xlim([0,max(sw%d[0])])"%i)
 exec("plt.savefig('./bestfit%d.png',dpi=500)"%i)
+
+plt.figure(figsize=(10,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Time (ms)")
+plt.ylabel("Voltage reading (V)",fontsize=12)
+exec("t1 = numpy.linspace(min(t_sw%d),max(t_sw%d),1500)"%(i,i))
+exec("plt.plot(t1,cos2(params_sound%d,t1),label='Best-fit curve')"%(i))
+exec("plt.plot(t_sw%d,sound_sw%d,'.',markersize=3)"%(i,i))
+exec("plt.xlim([0,max(t_sw%d)])"%i)
+exec("plt.savefig('./bestfitsound%d.png',dpi=500)"%i)
 """
 
 
