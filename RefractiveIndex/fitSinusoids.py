@@ -4,6 +4,31 @@ import matplotlib.pyplot as plt
 
 # ----------------------------- IMPORTING DATA ------------------------------
 
+f = open('./data/baseline.csv','r')
+bl = []
+for line in f:
+	l = line.strip('\n').strip('\r').split(',')
+	try:
+		l = [float(n) for n in l]
+		bl.append(l[1])
+	except ValueError:
+		continue
+baseline = (numpy.mean(bl))
+f.close()
+
+
+f = open('./data/high.csv')
+maxintensity = []
+for line in f:
+	l = line.strip('\n').strip('\r').split(',')
+	try:
+		l = [float(n) for n in l]
+		maxintensity.append(l[1])
+	except ValueError:
+		continue
+f.close()
+maxintensity = numpy.subtract(maxintensity,baseline)
+
 for i in range(1,4):
 	exec("f = open('./data/sw%d.csv','r')"%(i))
 	exec("sw%d = []"%(i))
@@ -12,19 +37,12 @@ for i in range(1,4):
 		try:
 			l = [float(n) for n in l]
 			exec("sw%d.append(l)"%(i))
-		except ValueError,e:
-			print(line)
+		except ValueError:
+			continue
 	f.close()
 	exec("sw%d = numpy.transpose(sw%d)"%(i,i))
-	plt.figure(figsize=(10,6), dpi=150)
-	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Signal (V)",fontsize=12)
-	plt.title("Photodiode response to interference vs. time")
-	exec("plt.xlim([0,max(sw%d[0])])"%(i))
-	exec("plt.errorbar(sw%d[0],sw%d[1],yerr=0.00005,fmt='+')"%(i,i))
-	exec("plt.savefig('sw%d.png',dpi=500)"%(i))
-	plt.show()
+	exec("sw%d[1] = sw%d[1]-min(sw%d[1])"%(i,i,i))
+	
 
 # ----------------------------- DATA PARAMETERS -----------------------------
 
@@ -43,10 +61,10 @@ l = 56.0/100
 ws = 4*d
 
 # baseline refractive index of air 
-nair = 1.0
+n0 = 1.0
 
 #  baseline intensity (mV)
-I0 = 360
+I0 = numpy.mean(maxintensity)
 
 # decibel level of sound 
 L = 0
@@ -56,9 +74,11 @@ fs = 343.0/ws
 
 # reference sound pressure in air 
 p0 = 2.0*10**(-5)
-"""
+
 # predicted ntube times 
-t0 = numpy.linspace(0,max(t1))
+t0 = numpy.linspace(min(sw1[0]),max(sw1[0]),1500)
+
+phierr = 0
 
 # -------------------------- PRED. REFRACTIVE INDEX -------------------------
 
@@ -67,25 +87,30 @@ p = 10**((p0*L)/20)
 # predicted tube refractive index 
 nt_pred = n0+p/patm*numpy.sin(2*numpy.pi*fs*t0+numpy.pi)
 
-
 # ----------------------------- PHASE SHIFT ---------------------------------
 
-# phase shift with no pressure
-phi0 = phi(I0)
+def phi(data):
+	return(numpy.multiply(2,numpy.arccos(numpy.sqrt(numpy.abs(numpy.divide(data,maxintensity))))))
 
 # phi(t) for all data sets
-for i in range(1,1): 
-	exec("phi_%d = phi(data_%d)"%(i,i))
+for i in range(1,4): 
+	exec("phi_%d = phi(sw%d[1])"%(i,i))
 
-def phi(data):
-	return (2*numpy.arccos(numpy.sqrt(2*data/I0)))
-
+# phase shift with no pressure
+phi0 = phi(maxintensity)
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
-for i in range(1,1):
- 	exec("nt_%d = nair*(d*numpy.divide(phi_%d,phi0)-1)"%(i,i))
+plt.plot(sw1[0],phi0)
+print(phi0)
 
+for i in range(1,4):
+ 	exec("nt_%d = n0*(d*numpy.divide(phi_%d,phi0)-1)"%(i,i))
+
+print(nt_pred)
+print(nt_1)
+print(nt_2)
+print(nt_3)
 
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
 
@@ -98,7 +123,7 @@ def cos2(p,x):
 	s = numpy.cos(s)
 	s = numpy.square(s)
 
-	return numpy.add(numpy.multiply(amp,s))
+	return numpy.multiply(amp,s)
 
 def residual(p,x,y):
 	return numpy.subtract(y,cos2(p,x))
@@ -107,8 +132,35 @@ def residual(p,x,y):
 # --------------------------- EVALUATION OF FIT ------------------------------
 
 for i in range(1,2): 
-	exec("fg = [(max(data_%d)-min(data%d)),0.0"%i)
-	exec("params_%d,success%d = leastsq(residual,fg,args=(t%d))"%(i,i,i))
+	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0]"%(i,i))
+	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]))"%(i,i,i,i))
+
+#plt.plot(t0,cos2(params_1,t0))
+#plt.plot(sw1[0],sw1[1])
+#plt.show()
+
+# ----------------------------- GENERATING PLOTS -----------------------------
+"""
+
+for i in range(1,4):
+	plt.figure(figsize=(10,6), dpi=150)
+	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+	plt.xlabel("Time (ms)")
+	plt.ylabel("$\phi$ (rad)",fontsize=12)
+	plt.title("Phase shift angle vs. time")
+	exec("plt.xlim([0,max(sw%d[0])])"%(i))
+	exec("plt.errorbar(sw%d[0],phi_%d,yerr=phierr,fmt='+')"%(i,i))
+	exec("plt.savefig('phase%d.png',dpi=500)"%(i))
+
+for i in range(1,4):
+	plt.figure(figsize=(10,6), dpi=150)
+	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Signal (V)",fontsize=12)
+	plt.title("Photodiode response to interference vs. time")
+	exec("plt.xlim([0,max(sw%d[0])])"%(i))
+	exec("plt.errorbar(sw%d[0],sw%d[1],yerr=0.00005,fmt='+')"%(i,i))
+	exec("plt.savefig('sw%d.png',dpi=500)"%(i))
 
 # ------------------------------- TESTING CODE -------------------------------
 
