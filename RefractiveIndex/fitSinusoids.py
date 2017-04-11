@@ -30,6 +30,7 @@ for line in f:
 f.close()
 maxintensity = numpy.subtract(maxintensity,baseline)
 
+
 for i in range(1,4):
 	exec("f = open('./data/sw%d.csv','r')"%(i))
 	exec("sw%d = []"%(i))
@@ -104,12 +105,12 @@ nt_pred = n0+p/patm*numpy.sin(2*numpy.pi*fs*t0+numpy.pi)
 def phi(data):
 	toreturn = []
 	for i in range(len(data)):
-		if(numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))>1):
-			toreturn.append(2*numpy.arccos(1))
+		if(-numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))<-1):
+			toreturn.append(2*numpy.arccos(-1))
 		else:
-			toappend = (2*numpy.arccos(numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))))
-			#while(toappend>=2*numpy.pi):
-			#	toappend = toappend-2*numpy.pi
+			toappend = (2*numpy.arccos(-numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))))
+			while(toappend>=2*numpy.pi):
+				toappend = toappend-2*numpy.pi
 			toreturn.append(toappend)
 	return(toreturn)
 
@@ -120,10 +121,18 @@ for i in range(1,4):
 # phase shift with no pressure
 phi0 = numpy.arccos(numpy.sqrt(2*numpy.mean(maxintensity)))
 
+#plt.plot(sw1[0],phi_1)
+#plt.plot(sw1[0],phi_2)
+#plt.plot(sw1[0],phi_3)
+#plt.show()
+
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
 for i in range(1,4):
-	exec("nt_%d = 1+numpy.divide(numpy.multiply(wl,numpy.divide(phi_%d,2*numpy.pi)),d)"%(i,i))
+	exec("print(%d,numpy.mean(numpy.divide(phi_%d,phi0)))"%(i,i))
+	exec("nt_%d = 1+numpy.divide(numpy.multiply(wl,numpy.divide(phi_%d,phi0)),d)"%(i,i))
+
+
 
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
 
@@ -151,10 +160,12 @@ for i in range(1,2):
 
 
 # ----------------------------- PRINTING DATA --------------------------------
+
 print("REFRACTIVE INDICES")
 print(numpy.mean(nt_1))
 print(numpy.mean(nt_2))
 print(numpy.mean(nt_3))
+
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
@@ -179,6 +190,17 @@ for i in range(1,4):
 	exec("plt.errorbar(sw%d[0],sw%d[1],yerr=0.00005,fmt='+')"%(i,i))
 	exec("plt.savefig('sw%d.png',dpi=500)"%(i))
 
+plt.figure(figsize=(10,8), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', fontsize=10, scilimits=(0,0))
+plt.xlabel("Time (ms)")
+plt.ylabel("Refractive index $n$",fontsize=12)
+plt.title("Refractive index vs. time of first, second, and third harmonic standing waves",y=1.04)
+plt.xlim([0,max(sw2[0])])
+plt.plot(sw1[0],nt_1,'o',markersize=1,label='First harmonic')
+plt.plot(sw2[0],nt_2,'.',markersize=1,label='Second harmonic')
+plt.plot(sw3[0],nt_3,'+',markersize=1,label='Third harmonic')
+plt.legend(fontsize=10,bbox_to_anchor=(0.95,1))
+plt.savefig('refractiveindices.png',dpi=500)
 # ------------------------------- TESTING CODE -------------------------------
 
 test = numpy.arange(0,25,0.1)
