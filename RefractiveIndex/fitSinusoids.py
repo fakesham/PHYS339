@@ -71,6 +71,9 @@ l = 56.0/100
 # wavelength of sound, m - first harmonic
 ws = 4*d
 
+# wavelength of laser light
+wl = 633.0*10**(-9)
+
 # baseline refractive index of air 
 n0 = 1.0
 
@@ -104,7 +107,10 @@ def phi(data):
 		if(numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))>1):
 			toreturn.append(2*numpy.arccos(1))
 		else:
-			toreturn.append(2*numpy.arccos(-numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))))
+			toappend = (2*numpy.arccos(numpy.sqrt(2*numpy.divide(data[i],numpy.mean(maxintensity)))))
+			#while(toappend>=2*numpy.pi):
+			#	toappend = toappend-2*numpy.pi
+			toreturn.append(toappend)
 	return(toreturn)
 
 # phi(t) for all data sets
@@ -112,16 +118,12 @@ for i in range(1,4):
 	exec("phi_%d = phi(sw%d[1])"%(i,i))
 
 # phase shift with no pressure
+phi0 = numpy.arccos(numpy.sqrt(2*numpy.mean(maxintensity)))
 
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
 for i in range(1,4):
- 	exec("nt_%d = n0*(numpy.subtract(1,d*numpy.divide(phi_%d,2*numpy.pi)))"%(i,i))
-
-print(numpy.mean(nt_pred))
-print(numpy.mean(nt_1))
-print(numpy.mean(nt_2))
-print(numpy.mean(nt_3))
+	exec("nt_%d = 1+numpy.divide(numpy.multiply(wl,numpy.divide(phi_%d,2*numpy.pi)),d)"%(i,i))
 
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
 
@@ -146,6 +148,13 @@ def residual(p,x,y):
 for i in range(1,2): 
 	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,700,numpy.mean(sw%d[1])]"%(i,i,i))
 	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=1000)"%(i,i,i,i))
+
+
+# ----------------------------- PRINTING DATA --------------------------------
+print("REFRACTIVE INDICES")
+print(numpy.mean(nt_1))
+print(numpy.mean(nt_2))
+print(numpy.mean(nt_3))
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
