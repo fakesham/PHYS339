@@ -140,11 +140,12 @@ def cos2(p,x):
 	freq = p[2]
 	off = p[3]
 
-	s = numpy.multiply(freq, numpy.subtract(x,phase))
+	s = numpy.multiply(2*numpy.pi*freq, numpy.subtract(x,phase))
 	s = numpy.cos(s)
 	s = numpy.multiply(amp,s)
+	#s = numpy.square(s)
 
-	return numpy.square(s)
+	return numpy.add(s,off)
 
 def residual(p,x,y):
 	return numpy.subtract(y,cos2(p,x))
@@ -154,16 +155,26 @@ def residual(p,x,y):
 
 # frequencies of sound waves used
 freqs = [181,494,777]
-"""
+
+""
 for i in range(1,4): 
 	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,freqs[%d-1],numpy.mean(sw%d[1])]"%(i,i,i,i))
-	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]))"%(i,i,i,i))
-	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]))"%(i,i,i))
-	exec("plt.plot(sw%d[0],sw%d[1],'.')"%(i,i))
-	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]))"%(i,i,i))
-	exec("plt.plot(numpy.divide(t_sw%d,1000.0),numpy.divide(sound_sw%d,10000.0),'.')"%(i,i))
-	plt.show()
-"""
+	print(fg)
+	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=100000)"%(i,i,i,i))
+	
+
+	plt.figure(figsize=(10,6), dpi=150)
+	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Voltage reading (V)",fontsize=12)
+	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]),label='Best-fit curve')"%(i,i,i))
+	exec("plt.plot(sw%d[0],sw%d[1],'.',markersize=3)"%(i,i))
+	exec("plt.xlim([0,max(sw%d[0])])"%i)
+	exec("plt.savefig('./bestfit%d.png',dpi=500)"%i)
+	#exec("plt.plot(numpy.divide(t_sw%d,8900.0),numpy.divide(sound_sw%d,10000.0),'.')"%(i,i))
+	#exec("plt.xlim([0,max(sw%d[0])])"%i)
+	#plt.show()
+
 # ----------------------------- PRINTING DATA --------------------------------
 
 print("REFRACTIVE INDICES")
@@ -171,12 +182,17 @@ print(numpy.mean(nt_1))
 print(numpy.mean(nt_2))
 print(numpy.mean(nt_3))
 
+print("-----------------------------")
+print("FREQUENCIES")
+print(params_1[2])
+print(params_2[2])
+print(params_3[2])
 
 # ----------------------------- GENERATING PLOTS -----------------------------
 """
 
 for i in range(1,4):
-	plt.figure(figsize=(10,6), dpi=150)
+	plt.figure(figsize=(8,6), dpi=150)
 	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 	plt.xlabel("Time (ms)")
 	plt.ylabel("$\phi$ (rad)",fontsize=12)
