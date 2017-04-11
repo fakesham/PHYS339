@@ -109,7 +109,6 @@ void userAction() {
   e_temperature = eVThermo * vThermo;
   prevError = error;
   error = (temperature - Tset) / band;
-
   /*
   if ((out > 0) && (temperature > Toff)) {
     out = 0;
@@ -135,9 +134,9 @@ void userAction() {
   integral = (1/iat*(integration(error,prevError,dt)));
 
   integralsum += integral;
-  if (fabs(error) > 0.5) integralsum = 0;
+  if (fabs(error) > 0.5){ integralsum = 0;
   derivative=0; 
-  integralsum=0; 
+  }
   power = 0.5 - error + derivative - integralsum;
   if (power > 1) power = 1;
   if (power < 0) power = 0;
