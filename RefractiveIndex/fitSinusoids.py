@@ -53,8 +53,8 @@ sound = scipy.io.loadmat('./data/494.mat')
 sound_sw2 = numpy.transpose(sound['y'])
 t_sw2 = numpy.transpose(sound['x'])
 sound = scipy.io.loadmat('./data/777.mat')
-sound_sw3 = numpy.transpose(sound['x'])
-t_sw3 = numpy.transpose(sound['y'])
+sound_sw3 = numpy.transpose(sound['y'])
+t_sw3 = numpy.transpose(sound['x'])
 
 # ----------------------------- DATA PARAMETERS -----------------------------
 
@@ -129,9 +129,7 @@ phi0 = numpy.arccos(numpy.sqrt(2*numpy.mean(maxintensity)))
 # -------------------------- OBSERVED REFRACTIVE INDEX ----------------------
 
 for i in range(1,4):
-	exec("print(%d,numpy.mean(numpy.divide(phi_%d,phi0)))"%(i,i))
 	exec("nt_%d = 1+numpy.divide(numpy.multiply(wl,numpy.divide(phi_%d,phi0)),d)"%(i,i))
-
 
 
 # ----------------------------- INTENSITY FITTING DATA ---------------------------
@@ -154,11 +152,18 @@ def residual(p,x,y):
 
 # --------------------------- EVALUATION OF FIT ------------------------------
 
-for i in range(1,2): 
-	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,700,numpy.mean(sw%d[1])]"%(i,i,i))
-	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=1000)"%(i,i,i,i))
-
-
+# frequencies of sound waves used
+freqs = [181,494,777]
+"""
+for i in range(1,4): 
+	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,freqs[%d-1],numpy.mean(sw%d[1])]"%(i,i,i,i))
+	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]))"%(i,i,i,i))
+	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]))"%(i,i,i))
+	exec("plt.plot(sw%d[0],sw%d[1],'.')"%(i,i))
+	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]))"%(i,i,i))
+	exec("plt.plot(numpy.divide(t_sw%d,1000.0),numpy.divide(sound_sw%d,10000.0),'.')"%(i,i))
+	plt.show()
+"""
 # ----------------------------- PRINTING DATA --------------------------------
 
 print("REFRACTIVE INDICES")
@@ -190,17 +195,21 @@ for i in range(1,4):
 	exec("plt.errorbar(sw%d[0],sw%d[1],yerr=0.00005,fmt='+')"%(i,i))
 	exec("plt.savefig('sw%d.png',dpi=500)"%(i))
 
-plt.figure(figsize=(10,8), dpi=150)
+plt.figure(figsize=(10,8), dpi=100)
 plt.ticklabel_format(style='sci', axis='y', fontsize=10, scilimits=(0,0))
 plt.xlabel("Time (ms)")
 plt.ylabel("Refractive index $n$",fontsize=12)
-plt.title("Refractive index vs. time of first, second, and third harmonic standing waves",y=1.04)
+#plt.title("Refractive index vs. time of first, second, and third harmonic standing waves",y=1.04)
 plt.xlim([0,max(sw2[0])])
 plt.plot(sw1[0],nt_1,'o',markersize=1,label='First harmonic')
 plt.plot(sw2[0],nt_2,'.',markersize=1,label='Second harmonic')
 plt.plot(sw3[0],nt_3,'+',markersize=1,label='Third harmonic')
 plt.legend(fontsize=10,bbox_to_anchor=(0.95,1))
-plt.savefig('refractiveindices.png',dpi=500)
+plt.savefig('./pictures/refractiveindices.png',dpi=500)
+"""
+
+
+"""
 # ------------------------------- TESTING CODE -------------------------------
 
 test = numpy.arange(0,25,0.1)
