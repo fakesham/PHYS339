@@ -47,14 +47,14 @@ for i in range(1,4):
 	exec("sw%d[0] = sw%d[0]-min(sw%d[0])"%(i,i,i))
 
 sound = scipy.io.loadmat('./data/181hz.mat')
-sound_sw1 = numpy.transpose(sound['y'])
-t_sw1 = numpy.transpose(sound['x'])
+sound_sw1 = sound['y'][0]
+t_sw1 = numpy.divide(sound['x'][0],8900.0)
 sound = scipy.io.loadmat('./data/494.mat')
-sound_sw2 = numpy.transpose(sound['y'])
-t_sw2 = numpy.transpose(sound['x'])
+sound_sw2 = sound['y'][0]
+t_sw2 = numpy.divide(sound['x'][0],8900.0)
 sound = scipy.io.loadmat('./data/777.mat')
-sound_sw3 = numpy.transpose(sound['y'])
-t_sw3 = numpy.transpose(sound['x'])
+sound_sw3 = sound['y'][0]
+t_sw3 = numpy.divide(sound['x'][0],8900.0)
 
 # ----------------------------- DATA PARAMETERS -----------------------------
 
@@ -156,24 +156,24 @@ def residual(p,x,y):
 # frequencies of sound waves used
 freqs = [181,494,777]
 
-""
 for i in range(1,4): 
 	exec("fg = [(max(sw%d[1])-min(sw%d[1])),0.0,freqs[%d-1],numpy.mean(sw%d[1])]"%(i,i,i,i))
-	print(fg)
 	exec("params_%d,success%d = leastsq(residual,fg,args=(sw%d[0],sw%d[1]),maxfev=100000)"%(i,i,i,i))
 	
-
+for i in range(1,4): 
+	exec("fg = [(max(sound_sw%d)-min(sound_sw%d)),0.0,freqs[%d-1],numpy.mean(sound_sw%d)]"%(i,i,i,i))
+	exec("params_sound%d,success_sound%d = leastsq(residual,fg,args=(t_sw%d,sound_sw%d),maxfev=100000)"%(i,i,i,i))
 	plt.figure(figsize=(10,6), dpi=150)
 	plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Voltage reading (V)",fontsize=12)
-	exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]),label='Best-fit curve')"%(i,i,i))
-	exec("plt.plot(sw%d[0],sw%d[1],'.',markersize=3)"%(i,i))
-	exec("plt.xlim([0,max(sw%d[0])])"%i)
-	exec("plt.savefig('./bestfit%d.png',dpi=500)"%i)
-	#exec("plt.plot(numpy.divide(t_sw%d,8900.0),numpy.divide(sound_sw%d,10000.0),'.')"%(i,i))
-	#exec("plt.xlim([0,max(sw%d[0])])"%i)
-	#plt.show()
+	exec("t1 = numpy.linspace(min(t_sw%d),max(t_sw%d),1500)"%(i,i))
+	exec("plt.plot(t1,cos2(params_sound%d,t1),label='Best-fit curve')"%(i))
+	exec("plt.plot(t_sw%d,sound_sw%d,'.',markersize=3)"%(i,i))
+	exec("plt.xlim([0,max(t_sw%d)])"%i)
+	exec("plt.savefig('./bestfitsound%d.png',dpi=500)"%i)
+
+print(params_sound1)
 
 # ----------------------------- PRINTING DATA --------------------------------
 
@@ -222,6 +222,16 @@ plt.plot(sw2[0],nt_2,'.',markersize=1,label='Second harmonic')
 plt.plot(sw3[0],nt_3,'+',markersize=1,label='Third harmonic')
 plt.legend(fontsize=10,bbox_to_anchor=(0.95,1))
 plt.savefig('./pictures/refractiveindices.png',dpi=500)
+
+
+plt.figure(figsize=(10,6), dpi=150)
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+plt.xlabel("Time (ms)")
+plt.ylabel("Voltage reading (V)",fontsize=12)
+exec("plt.plot(sw%d[0],cos2(params_%d,sw%d[0]),label='Best-fit curve')"%(i,i,i))
+exec("plt.plot(sw%d[0],sw%d[1],'.',markersize=3)"%(i,i))
+exec("plt.xlim([0,max(sw%d[0])])"%i)
+exec("plt.savefig('./bestfit%d.png',dpi=500)"%i)
 """
 
 
